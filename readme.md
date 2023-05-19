@@ -114,7 +114,7 @@ type RenderOptions = {
   // 默认使用 HashRouter 或 BrowserRouter
   type?: 'hash' | 'history';
   // 在 Router 外层的包裹，例如使用 antd ConfigProvider 或者 Context 之类
-  Wrapper?: typeof React.Component | React.FC;
+  Wrapper?: React.ComponentClass | React.FC;
   // 页面组件使用默认 PageWrapper 处理简单事项，如修改 document.title 或者解析 params/query 等
   withPageWrapper?: boolean;
   // 使用自定义的 PageWrapper
@@ -135,5 +135,86 @@ createRoot(document.getElementById('app')).render(<AppRouter/>);
 createRoot(document.getElementById('app')).render(<MemoryRouter>
   <AppRoutes/>
 </MemoryRouter>);
+```
+
+#### withPageWrapper
+> 使用 PageWrapper 包裹页面
+
+###### 自定义 PageWrapper
+```typescript jsx
+type CustomPageWrapperProps = {
+  path: string;
+  Component: ReactComponent;
+  title?: string;
+  [p: string]: any;
+};
+
+type CustomPageWrapper = FC<CustomPageWrapperProps> | ComponentClass<CustomPageWrapperProps, any>;
+```
+
+###### 使用内置 PageWrapper 自动解析路由参数及query参数
+> 使用前
+
+```typescript jsx
+const Component = () => {
+  const params = useParams();
+  const id = params.id;
+};
+
+$page(Component, '/test/:id');
+```
+
+> 使用后
+
+```typescript jsx
+const Component = ({ params, query }) => {
+  const id = params.id;
+};
+
+$page(Component, '/test/:id');
+```
+
+#### childrenAsOutlet
+
+> 嵌套路由中使用 {children} 代替 <Outlet/>
+
+> 使用前
+```typescript jsx
+@page('/user', { title: '用户页面' })
+class PageUser extends React.Component {
+  render () {
+    return <>
+      <div>User</div>
+      <Outlet/>
+    </>
+  }
+}
+// 嵌套路由指定 context 
+@page('/:id', { title: '用户详情', context: '/user' })
+class PageUserInfo extends React.Component {
+  render () {
+    return <div>user info</div>
+  }
+}
+```
+
+> 使用后
+```typescript jsx
+@page('/user', { title: '用户页面' })
+class PageUser extends React.Component {
+  render () {
+    return <>
+      <div>User</div>
+      {this.props.children}
+    </>
+  }
+}
+// 嵌套路由指定 context 
+@page('/:id', { title: '用户详情', context: '/user' })
+class PageUserInfo extends React.Component {
+  render () {
+    return <div>user info</div>
+  }
+}
 ```
 

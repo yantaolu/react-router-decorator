@@ -1,4 +1,4 @@
-import React, { Fragment, ReactNode, useEffect, useMemo } from 'react';
+import React, { ComponentClass, FC, Fragment, ReactElement, ReactNode, useEffect, useMemo } from 'react';
 import { Root, createRoot } from 'react-dom/client';
 import {
   // components
@@ -90,11 +90,11 @@ type Extra = {
   childrenAsOutlet?: boolean;
 };
 
-type Component = (React.ComponentClass<any, any> | React.FC<any>) & Extra;
+type ReactComponent = (ComponentClass<any, any> | FC<any>) & Extra;
 
 type RouteOption = {
   path: string;
-  Component: Component;
+  Component: ReactComponent;
   title?: string;
   context?: string;
 };
@@ -134,7 +134,7 @@ export interface PageWrapperProps {
 
 const PageWrapper = (props: {
   path: string;
-  Component: typeof React.Component | React.FC;
+  Component: ReactComponent;
   title?: string;
   context?: string;
   childrenAsOutlet?: boolean;
@@ -142,6 +142,7 @@ const PageWrapper = (props: {
   const { Component, path, title, childrenAsOutlet } = props;
   const location = useLocation();
   const params = useParams();
+  const navigate = useNavigate();
   const query = useMemo(() => transSearch2Query(location.search), [location]);
 
   useEffect(() => {
@@ -155,14 +156,18 @@ const PageWrapper = (props: {
     return () => undefined;
   }, []);
 
-  const navigate = useNavigate();
-
-  return React.cloneElement(<Component>{!!childrenAsOutlet && <Outlet />}</Component>, {
-    query,
-    params,
-    navigate,
-    path,
-  });
+  return (
+    <Component
+      {...{
+        query,
+        params,
+        navigate,
+        path,
+      }}
+    >
+      {!!childrenAsOutlet && <Outlet />}
+    </Component>
+  );
 };
 
 const resolveAbsolutePath = (...paths: string[]) =>
@@ -211,7 +216,7 @@ export const page = (path: string | '/' | '*', options?: PageOptions) => {
     throw new Error(`路由路径不合法，支持的路由路径如: ${legalRouteRules.map((p) => `"${p}"`)}`);
   }
 
-  return (Component: Component): void => {
+  return (Component: ReactComponent): void => {
     _routeMap[resolveAbsolutePath(context, path)] = {
       path: absolutePath,
       Component: Component,
@@ -221,18 +226,18 @@ export const page = (path: string | '/' | '*', options?: PageOptions) => {
   };
 };
 
-export const $page = (Component: Component, path: string | '/' | '*', options?: PageOptions) => {
+export const $page = (Component: ReactComponent, path: string | '/' | '*', options?: PageOptions) => {
   return page(path, options)(Component);
 };
 
 type CustomPageWrapperProps = {
   path: string;
-  Component: typeof React.Component<any, any> | React.FC<any>;
+  Component: ReactComponent;
   title?: string;
   [p: string]: any;
 };
 
-type CustomPageWrapper = React.FC<CustomPageWrapperProps> | typeof React.Component<CustomPageWrapperProps, any>;
+type CustomPageWrapper = FC<CustomPageWrapperProps> | ComponentClass<CustomPageWrapperProps, any>;
 
 const transRoute = (
   config: RouteOption,
@@ -280,7 +285,7 @@ export const AppRoutes = ({
   CustomPageWrapper?: CustomPageWrapper;
   childrenAsOutlet?: boolean;
   debug?: boolean;
-}): React.ReactElement | null => {
+}): ReactElement | null => {
   const _routes = useMemo(() => {
     const _routes: Array<RouteObject> = [];
     const { ['/']: _index, ['/*']: _default, ...pages } = _routeMap;
@@ -356,7 +361,7 @@ export const AppRoutes = ({
 
 type RenderOptions = {
   type?: 'hash' | 'history';
-  Wrapper?: typeof React.Component | React.FC;
+  Wrapper?: ReactComponent;
   withPageWrapper?: boolean;
   CustomPageWrapper?: CustomPageWrapper;
   childrenAsOutlet?: boolean;
