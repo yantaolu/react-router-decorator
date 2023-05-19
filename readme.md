@@ -39,6 +39,12 @@
 }
 ```
 
+<div style='color: darkred'>
+
+#### !! 装饰器只是语法，并不能自动导入文件，所以仍需手动，webpack 自动导入的插件在开发中
+
+</div>
+
 #### 使用示例
 
 ```typescript jsx
