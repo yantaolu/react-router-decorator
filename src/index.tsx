@@ -359,6 +359,17 @@ export const AppRoutes = ({
   return useRoutes(_routes);
 };
 
+/**
+ * 获取所有的路由绝对路径及相关配置
+ */
+export const getRouteConfig = (): Record<string, RouteOption> =>
+  Object.keys(_routeMap)
+    .sort(routeSorter)
+    .reduce((prev, current) => {
+      prev[current] = _routeMap[current];
+      return prev;
+    }, {} as Record<string, RouteOption>);
+
 type RenderOptions = {
   type?: 'hash' | 'history';
   Wrapper?: ReactComponent;
