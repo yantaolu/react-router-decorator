@@ -1,6 +1,6 @@
 {
   "name": "react-router-decorator",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "基于 react-router-dom 封装的路由工具，提供装饰器/函数模式设置路由，自动排序，支持嵌套路由",
   "type": "module",
   "files": [

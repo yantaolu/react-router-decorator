@@ -8,7 +8,7 @@ export default defineConfig((options) => {
     clean: true,
     minify: !options.watch,
     dts: true,
-    format: ['esm', 'cjs', 'iife'],
+    format: ['esm', 'cjs'],
     target: 'es5',
     treeshake: false,
   };
