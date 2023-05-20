@@ -36,7 +36,8 @@
   },
   "include": [
     "src",
-    "types.d.ts"
+    "types.d.ts",
+    "examples"
   ],
   "exclude": [
     "node_modules",

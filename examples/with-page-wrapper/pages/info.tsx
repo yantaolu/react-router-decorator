@@ -1,8 +1,7 @@
 import React from 'react';
-import { $page, useParams } from 'react-router-decorator';
+import { $page, PageWrapperProps } from 'react-router-decorator';
 
-export const Info = () => {
-  const params = useParams();
+export const Info = ({ params }: PageWrapperProps) => {
   console.log('用户id', params.id);
   return <div>用户详情</div>;
 };
