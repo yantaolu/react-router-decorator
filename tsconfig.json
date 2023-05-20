@@ -12,7 +12,11 @@
     "module": "esnext",
     "rootDir": "./",
     "moduleResolution": "node",
-    "paths": {},
+    "paths": {
+      "react-router-decorator": [
+        "./src/index.tsx"
+      ]
+    },
     "resolveJsonModule": true,
     "allowArbitraryExtensions": true,
     "allowJs": true,
