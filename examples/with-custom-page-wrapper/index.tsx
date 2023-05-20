@@ -1,6 +1,7 @@
 import React, { ComponentClass, FC, useEffect } from 'react';
 import { renderApp, useParams } from 'react-router-decorator';
 import './pages/about';
+import './pages/home';
 import './pages/info';
 import './pages/user';
 
