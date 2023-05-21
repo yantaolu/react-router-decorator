@@ -1,47 +1,152 @@
-> 基于 react-router-dom 封装的路由工具，提供装饰器/函数模式设置路由，自动排序，支持嵌套路由
+<!-- ![npm bundle size](https://img.shields.io/bundlephobia/minzip/react-router-decorator) -->
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/yantaolu/react-router-dom-wrapping) ![npm-donwloads-per-week](https://img.shields.io/npm/dw/react-router-decorator) ![npm-donwloads-per-year](https://img.shields.io/npm/dy/decorator)
 
 ---
 
-<h4 style='color: #bd1515'> 类`decorator` 使用前需开启装饰器的相关配置，以 `TypeScript` 和 `Babel` 为例，部分参考如下</h4>
+# react-router-decorator
 
-- TypeScript 配置 tsconfig.json
+Custom route with class decorator or function, automatic sorting and support nested routes. Based on `react-router-dom`.
 
-    ```json
-    {
-      "compilerOptions": {
-        "emitDecoratorMetadata": true,
-        "experimentalDecorators": true,
-      }
-    }
-    ```
+基于 `react-router-dom` 封装，使用类装饰器或函数配置路由，自动排序，支持嵌套路由。
 
-- Babel 配置 [参照decorators插件](https://babeljs.io/docs/babel-plugin-proposal-decorators)，可结合 `webpack` 使用
+## Install
 
-    ```json
-    {
-      "plugins": [
-        ["@babel/plugin-proposal-decorators", { "version": "2023-01" }],
-        "@babel/plugin-proposal-class-properties"
-      ]
-    }
-    ```
+```
+$ npm install --save react-router-decorator
+```
 
-    ```json
-    {
-      "presets": ["@babel/preset-env"],
-      "plugins": [
-        ["@babel/plugin-proposal-decorators", { "version": "2023-01" }]
-      ]
-    }
-    ```
+or
 
-<h4 style='color: #bd1515'> !! 装饰器只是语法，并不能自动导入文件，仍需手动导入，webpack 自动导入的插件在开发中</h4>
+```
+$ yarn add react-router-decorator
+```
 
----
+or
 
-<h4> <a href="https://github.com/yantaolu/react-router-decorator/tree/main/examples">代码示例</a></h4>
+```
+$ pnpm add react-router-decorator
+```
 
-```typescript jsx
+## Use `class decorator` ([TC39 Proposal](https://github.com/tc39/proposal-decorators))
+
+### Config `tsconfig.json` to support `decorator`.
+
+```json
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  }
+}
+```
+
+### Config `Babel` to support JavaScript/Typescript compiling.
+
+```json
+{
+  "plugins": [
+    ["@babel/plugin-proposal-decorators", { "version": "2023-01" }],
+    "@babel/plugin-proposal-class-properties"
+  ]
+}
+```
+
+or
+
+```json
+{
+  "presets": ["@babel/preset-env"],
+  "plugins": [
+    ["@babel/plugin-proposal-decorators", { "version": "2023-01" }]
+  ]
+}
+```
+
+## API
+
+### renderApp(element: HTMLElement, options?: RenderOptions)
+
+instead of `ReactDOM.render(<App/>, element)`.
+
+#### element
+
+Type: `HTMLElement`, the `ReactDOM.render` root element.
+
+#### options
+
+Type: `RenderOptions`
+
+```ts
+import { ComponentClass, FC } from 'react';
+
+interface Extra {
+  withPageWrapper?: boolean;
+  childrenAsOutlet?: boolean;
+}
+
+type ReactComponent = (ComponentClass<any, any> | FC<any>) & Extra;
+
+interface CustomPageWrapperProps {
+  path: string;
+  Component: ReactComponent;
+  title?: string;
+  [p: string]: any;
+}
+
+type CustomPageWrapper = FC<CustomPageWrapperProps> | ComponentClass<CustomPageWrapperProps, any>;
+
+interface RenderOptions {
+  type?: 'hash' | 'history';
+  Wrapper?: ReactComponent;
+  withPageWrapper?: boolean;
+  CustomPageWrapper?: CustomPageWrapper;
+  childrenAsOutlet?: boolean;
+  debug?: boolean;
+}
+```
+
+### page(path: string | '/' | '*', options?: PageOptions)
+
+use class decorator to register route.
+
+#### path
+
+Type: `string` , `"/"` or `"*"`
+
+#### options
+
+Type: `PageOptions`, if `typeof PageOptions` is `string` it's mean `document title`.
+
+```ts
+type PageOptions = {
+  // document title
+  title?: string;
+  // context of nested routes
+  context?: string;
+} | string;
+```
+
+### $page(Component: ReactComponent, path: string | '/' | '*', options?: PageOptions)
+
+use function to register route.
+
+#### Component
+
+Type: `React.ComponentClass` or `React.FC`
+
+#### path
+
+Type: `string` , `"/"` or `"*"`
+
+#### options
+
+Type: `PageOptions`, if `typeof PageOptions` is `string` it's mean `document title`.
+
+## Usage
+
+### Use `page`, `$page`, `renderApp`
+
+```tsx
 import React from 'react';
 import { page, $page, Outlet, NavLink, renderApp } from 'react-router-decorator';
 
@@ -103,127 +208,107 @@ $page(FuncComponent, '/fun2');
 renderApp(document.getElementById('app'));
 ```
 
----
+### Custom render
 
-- ReactDOM.render 的各种替代方式
+```tsx
+import React from 'react';
+import { Root, createRoot } from 'react-dom/client';
+import { AppRouter, AppRoutes, MemoryRouter } from 'react-router-decorator';
 
-    ```typescript jsx
-    import React from 'react';
-    import { Root, createRoot } from 'react-dom/client';
-    import { AppRouter, AppRoutes, MemoryRouter, renderApp } from 'react-router-decorator';
-    
-    type RenderOptions = {
-      // 默认使用 HashRouter 或 BrowserRouter
-      type?: 'hash' | 'history';
-      // 在 Router 外层的包裹，例如使用 antd ConfigProvider 或者 Context 之类
-      Wrapper?: React.ComponentClass | React.FC;
-      // 页面组件使用默认 PageWrapper 处理简单事项，如修改 document.title 或者解析 params/query 等
-      withPageWrapper?: boolean;
-      // 使用自定义的 PageWrapper
-      CustomPageWrapper?: CustomPageWrapper;
-      // 嵌套路由中使用 {children} 代替 <Outlet/>
-      childrenAsOutlet?: boolean;
-      // console一些关于路由的调试信息
-      debug?: boolean;
-    };
-    
-    // 方式一：renderApp
-    renderApp(document.getElementById('app'), {});
-    
-    // 方式二：AppRouter
-    createRoot(document.getElementById('app')).render(<AppRouter/>);
-    
-    // 方式三：AppRoutes
-    createRoot(document.getElementById('app')).render(<MemoryRouter>
-      <AppRoutes/>
-    </MemoryRouter>);
-    ```
+// render AppRouter
+createRoot(document.getElementById('app')).render(<AppRouter type={'hash'}/>);
 
+// render AppRoutes
+createRoot(document.getElementById('app')).render(<MemoryRouter>
+  <AppRoutes/>
+</MemoryRouter>);
+```
 
-- withPageWrapper (使用 PageWrapper 包裹页面)
+### withPageWrapper
 
-  - 自定义 PageWrapper
+- CustomPageWrapper
 
-  ```typescript jsx
-  type CustomPageWrapperProps = {
-    path: string;
-    Component: ReactComponent;
-    title?: string;
-    [p: string]: any;
-  };
+```tsx
+type CustomPageWrapperProps = {
+  path: string;
+  Component: ReactComponent;
+  title?: string;
+  [p: string]: any;
+};
 
-  type CustomPageWrapper = FC<CustomPageWrapperProps> | ComponentClass<CustomPageWrapperProps, any>;
-  ```
+type CustomPageWrapper = FC<CustomPageWrapperProps> | ComponentClass<CustomPageWrapperProps, any>;
+```
 
-  - 使用前
+- `withPageWrapper: false`
 
-  ```typescript jsx
-  import React from 'react';
-    
-  const Component = () => {
-    const params = useParams();
-    const id = params.id;
-    return <>{id}</>
-  };
-    
-  $page(Component, '/test/:id');
-  ```
+```tsx
+import React from 'react';
+  
+const Component = () => {
+  const params = useParams();
+  const id = params.id;
+  return <>{id}</>
+};
+  
+$page(Component, '/test/:id');
+```
 
-  - 内置 PageWrapper 自动解析路由参数及query参数，使用后
+- `withPageWrapper: true`
 
-  ```typescript jsx
-  import React from 'react';
-    
-  const Component = ({ params, query }) => {
-    const id = params.id;
-    return <>{id}</>
-  };
-    
-  $page(Component, '/test/:id');
-  ```
+```tsx
+import React from 'react';
+  
+const Component = ({ params, query }) => {
+  const id = params.id;
+  return <>{id}</>
+};
+  
+$page(Component, '/test/:id');
+```
 
 
-- childrenAsOutlet (嵌套路由中使用 `{ children }` 代替 `<Outlet/>`)
+### childrenAsOutlet (`{ children } instead of <Outlet/>`)
 
-  - 使用前
+- `childrenAsOutlet: false`
 
-  ```typescript jsx
-  @page('/user', { title: '用户页面' })
-  class PageUser extends React.Component {
-    render () {
-      return <>
-        <div>User</div>
-        <Outlet/>
-      </>
-    }
+```tsx
+@page('/user', { title: '用户页面' })
+class PageUser extends React.Component {
+  render () {
+    return <>
+      <div>User</div>
+      <Outlet/>
+    </>
   }
-  // 嵌套路由指定 context 
-  @page('/:id', { title: '用户详情', context: '/user' })
-  class PageUserInfo extends React.Component {
-    render () {
-      return <div>user info</div>
-    }
-  }
-  ```
+}
 
-  - 使用后
-
-  ```typescript jsx
-  @page('/user', { title: '用户页面' })
-  class PageUser extends React.Component {
-    render () {
-      return <>
-        <div>User</div>
-        {this.props.children}
-      </>
-    }
+// 嵌套路由指定 context 
+@page('/:id', { title: '用户详情', context: '/user' })
+class PageUserInfo extends React.Component {
+  render () {
+    return <div>user info</div>
   }
+}
+```
 
-  // 嵌套路由指定 context 
-  @page('/:id', { title: '用户详情', context: '/user' })
-  class PageUserInfo extends React.Component {
-    render () {
-      return <div>user info</div>
-    }
+- `childrenAsOutlet: true`
+
+```tsx
+@page('/user', { title: '用户页面' })
+class PageUser extends React.Component {
+  render () {
+    return <>
+      <div>User</div>
+      {this.props.children}
+    </>
   }
-  ```
+}
+
+// 嵌套路由指定 context 
+@page('/:id', { title: '用户详情', context: '/user' })
+class PageUserInfo extends React.Component {
+  render () {
+    return <div>user info</div>
+  }
+}
+```

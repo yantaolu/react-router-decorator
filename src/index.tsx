@@ -85,10 +85,10 @@ export {
   useSubmit,
 };
 
-type Extra = {
+interface Extra {
   withPageWrapper?: boolean;
   childrenAsOutlet?: boolean;
-};
+}
 
 type ReactComponent = (ComponentClass<any, any> | FC<any>) & Extra;
 
@@ -230,12 +230,12 @@ export const $page = (Component: ReactComponent, path: string | '/' | '*', optio
   return page(path, options)(Component);
 };
 
-export type CustomPageWrapperProps = {
+export interface CustomPageWrapperProps {
   path: string;
   Component: ReactComponent;
   title?: string;
   [p: string]: any;
-};
+}
 
 type CustomPageWrapper = FC<CustomPageWrapperProps> | ComponentClass<CustomPageWrapperProps, any>;
 
@@ -370,14 +370,14 @@ export const getRouteConfig = (): Record<string, RouteOption> =>
       return prev;
     }, {} as Record<string, RouteOption>);
 
-type RenderOptions = {
+interface RenderOptions {
   type?: 'hash' | 'history';
   Wrapper?: ReactComponent;
   withPageWrapper?: boolean;
   CustomPageWrapper?: CustomPageWrapper;
   childrenAsOutlet?: boolean;
   debug?: boolean;
-};
+}
 
 export const AppRouter = (props: RenderOptions) => {
   const { type, Wrapper = Fragment, ...others } = props;
