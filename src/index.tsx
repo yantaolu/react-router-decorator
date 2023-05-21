@@ -210,12 +210,12 @@ const $page = (Component: ReactComponent, path: string | '/' | '*', options?: Pa
  */
 const transRoute = (
   config: RouteOption,
-  options: { withPageWrapper: boolean; childrenAsOutlet: boolean; CustomPageWrapper?: PageWrapper },
+  options: Pick<RenderOptions, 'PageWrapper' | 'withPageWrapper' | 'childrenAsOutlet'>,
 ): RouteObject => {
   const { path, Component, title, context, ...routeObject } = config;
   const _withPageWrapper = Component.withPageWrapper ?? options.withPageWrapper;
   const _childrenAsOutlet = Component.childrenAsOutlet ?? options.childrenAsOutlet;
-  const _PageWrapper: any = options.CustomPageWrapper ?? PageWrapper;
+  const _PageWrapper: React.ComponentType<any> = options.PageWrapper ?? PageWrapper;
   return {
     ...routeObject,
     path,
@@ -258,23 +258,11 @@ const routeSorter = (a: string, b: string) => {
 
 /**
  * useRoutes
- * @param withPageWrapper
- * @param CustomPageWrapper
- * @param childrenAsOutlet
- * @param debug
+ * @param props
  * @constructor
  */
-const AppRoutes = ({
-  withPageWrapper = true,
-  CustomPageWrapper,
-  childrenAsOutlet = false,
-  debug,
-}: {
-  withPageWrapper?: boolean;
-  CustomPageWrapper?: PageWrapper;
-  childrenAsOutlet?: boolean;
-  debug?: boolean;
-}): React.ReactElement | null => {
+const AppRoutes = (props: Omit<RenderOptions, 'type' | 'Wrapper'>): React.ReactElement | null => {
+  const { withPageWrapper = true, PageWrapper, childrenAsOutlet = false, debug = false } = props;
   const _routes = useMemo(() => {
     const _routes: Array<RouteObject> = [];
     const { ['/']: _index, ['/*']: _default, ...pages } = _routeMap;
@@ -309,7 +297,7 @@ const AppRoutes = ({
       return _ctx;
     };
 
-    const transOption = { withPageWrapper, childrenAsOutlet, CustomPageWrapper };
+    const transOption = { withPageWrapper, childrenAsOutlet, PageWrapper };
 
     _index && _routes.push(transRoute(_index, transOption));
 
@@ -428,6 +416,7 @@ export {
   AppRouter,
   AppRoutes,
   getRouteConfig,
+  PageWrapper,
   page,
   renderApp,
   routeSorter,
