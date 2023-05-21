@@ -33,6 +33,7 @@ interface WithWrappedProps {
   query: SearchQuery;
   params: Record<string, string>;
   navigate: NavigateFunction;
+  path: string;
   children?: React.ReactNode;
 }
 

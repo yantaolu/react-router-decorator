@@ -97,7 +97,7 @@ const transSearch2Query = (search: string): SearchQuery => {
  * @constructor
  */
 const PageWrapper = (props: PageWrapperProps) => {
-  const { Component, title, childrenAsOutlet } = props;
+  const { Component, title, childrenAsOutlet, context = '', path } = props;
   const location = useLocation();
   const params = useParams();
   const navigate = useNavigate();
@@ -109,16 +109,10 @@ const PageWrapper = (props: PageWrapperProps) => {
     return () => {
       document.title = originalTitle;
     };
-  }, []);
+  }, [title]);
 
   return (
-    <Component
-      {...{
-        query,
-        params,
-        navigate,
-      }}
-    >
+    <Component path={resolveAbsolutePath(context, path)} params={params} query={query} navigate={navigate}>
       {!!childrenAsOutlet && <Outlet />}
     </Component>
   );
