@@ -1,4 +1,4 @@
-import React, { ComponentClass, FC, Fragment, ReactElement, ReactNode, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Root, createRoot } from 'react-dom/client';
 import {
   // components
@@ -44,79 +44,45 @@ import {
   useSubmit,
 } from 'react-router-dom';
 
-export type { NavigateFunction };
-export {
-  // components
-  Await,
-  Form,
-  Link,
-  MemoryRouter,
-  NavLink,
-  Navigate,
-  Outlet,
-  ScrollRestoration,
-  // hooks
-  useActionData,
-  useAsyncError,
-  useAsyncValue,
-  useBeforeUnload,
-  useFetcher,
-  useFetchers,
-  useFormAction,
-  useHref,
-  useInRouterContext,
-  useLinkClickHandler,
-  useLoaderData,
-  useLocation,
-  useMatch,
-  useMatches,
-  useNavigate,
-  useNavigation,
-  useNavigationType,
-  useOutlet,
-  useOutletContext,
-  useParams,
-  useResolvedPath,
-  useRevalidator,
-  useRouteError,
-  useRouteLoaderData,
-  useRoutes,
-  useSearchParams,
-  useSubmit,
-};
+import type {
+  CustomPageWrapper,
+  CustomPageWrapperProps,
+  PageOptions,
+  PageWrapperProps,
+  ReactComponent,
+  RenderOptions,
+  RouteOption,
+  SearchQuery,
+} from './types';
 
-interface Extra {
-  withPageWrapper?: boolean;
-  childrenAsOutlet?: boolean;
-}
-
-type ReactComponent = (ComponentClass<any, any> | FC<any>) & Extra;
-
-type RouteOption = {
-  path: string;
-  Component: ReactComponent;
-  title?: string;
-  context?: string;
-};
-
+/**
+ * 记录路由
+ */
 const _routeMap: Record<string, RouteOption> = {};
 
-type PageOptions =
-  | {
-      title?: string;
-      context?: string;
-    }
-  | string;
-
-const transSearch2Query = (search: string): Record<string, string | number> => {
+/**
+ * 地址栏中的 search 转换为 query 对象
+ * @param search
+ */
+const transSearch2Query = (search: string): SearchQuery => {
   return (
     search
       ?.replace(/^\?+/, '')
       .split('&')
-      .reduce((prev: Record<string, number | string>, current) => {
+      .reduce((prev: Record<string, number | string | Array<string | number>>, current) => {
         try {
           const [key, value] = current.split('=').map(decodeURIComponent);
-          prev[key] = /^[1-9]\d*$/.test(value) && value <= `${Number.MAX_SAFE_INTEGER}` ? Number(value) : value;
+          // Automatic parsing number
+          const val = /^[1-9]\d*$/.test(value) && value <= `${Number.MAX_SAFE_INTEGER}` ? Number(value) : value;
+          // Array
+          if (key in prev) {
+            if (!Array.isArray(prev[key])) {
+              prev[key] = [prev[key] as string | number];
+            }
+            (prev[key] as Array<string | number>).push(val);
+          } else {
+            prev[key] = val;
+          }
         } catch (e) {
           console.error(e);
         }
@@ -125,13 +91,11 @@ const transSearch2Query = (search: string): Record<string, string | number> => {
   );
 };
 
-export interface PageWrapperProps {
-  query: Record<string, string | number>;
-  params: Record<string, string>;
-  navigate: NavigateFunction;
-  children?: ReactNode;
-}
-
+/**
+ * 默认页面 Wrapper 附加自动解析 params、query 追加 navigate
+ * @param props
+ * @constructor
+ */
 const PageWrapper = (props: {
   path: string;
   Component: ReactComponent;
@@ -143,17 +107,14 @@ const PageWrapper = (props: {
   const location = useLocation();
   const params = useParams();
   const navigate = useNavigate();
-  const query = useMemo(() => transSearch2Query(location.search), [location]);
+  const query = useMemo(() => transSearch2Query(location.search), [location.search]);
 
   useEffect(() => {
-    if (title) {
-      const originalTitle = document.title;
-      document.title = title;
-      return () => {
-        document.title = originalTitle;
-      };
-    }
-    return () => undefined;
+    const originalTitle = document.title;
+    title && (document.title = title);
+    return () => {
+      document.title = originalTitle;
+    };
   }, []);
 
   return (
@@ -170,6 +131,10 @@ const PageWrapper = (props: {
   );
 };
 
+/**
+ * 路由路径统一转换为绝对路径
+ * @param paths
+ */
 const resolveAbsolutePath = (...paths: string[]) =>
   [
     '/',
@@ -182,6 +147,9 @@ const resolveAbsolutePath = (...paths: string[]) =>
     .join('/')
     .replace(/\/+/g, '/');
 
+/**
+ * 路由路径正则
+ */
 const routeRegExp = /^(\/?((:?[\w\d_-]+\??)|(\*)))+$/i;
 
 const legalRouteRules = `/
@@ -202,8 +170,13 @@ test
 
 // legalRouteRules.map((str) => console[routeRegExp.test(str) ? 'log' : 'error'](str));
 
-export const page = (path: string | '/' | '*', options?: PageOptions) => {
-  const { title, context = '' } = typeof options === 'string' ? { title: options } : options ?? {};
+/**
+ * 类装饰器，用于注册类组件路由
+ * @param path 路由路径
+ * @param options 附加参数
+ */
+const page = (path: string | '/' | '*', options?: PageOptions) => {
+  const { title, context = '', ...routeObject } = typeof options === 'string' ? { title: options } : options ?? {};
 
   // 嵌套路由上下文不合法
   if (context.trim() && !context.startsWith('/')) {
@@ -218,6 +191,7 @@ export const page = (path: string | '/' | '*', options?: PageOptions) => {
 
   return (Component: ReactComponent): void => {
     _routeMap[resolveAbsolutePath(context, path)] = {
+      ...routeObject,
       path: absolutePath,
       Component: Component,
       context,
@@ -226,28 +200,31 @@ export const page = (path: string | '/' | '*', options?: PageOptions) => {
   };
 };
 
-export const $page = (Component: ReactComponent, path: string | '/' | '*', options?: PageOptions) => {
+/**
+ * 函数注册路由，类组件和函数组件均可使用
+ * @param Component
+ * @param path
+ * @param options
+ */
+const $page = (Component: ReactComponent, path: string | '/' | '*', options?: PageOptions): void => {
   return page(path, options)(Component);
 };
 
-export interface CustomPageWrapperProps {
-  path: string;
-  Component: ReactComponent;
-  title?: string;
-  [p: string]: any;
-}
-
-type CustomPageWrapper = FC<CustomPageWrapperProps> | ComponentClass<CustomPageWrapperProps, any>;
-
+/**
+ * 将路由配置转换为目标对象
+ * @param config
+ * @param options
+ */
 const transRoute = (
   config: RouteOption,
   options: { withPageWrapper: boolean; childrenAsOutlet: boolean; CustomPageWrapper?: CustomPageWrapper },
-) => {
-  const { path, Component, title } = config;
+): RouteObject => {
+  const { path, Component, title, context, ...routeObject } = config;
   const _withPageWrapper = Component.withPageWrapper ?? options.withPageWrapper;
   const _childrenAsOutlet = Component.childrenAsOutlet ?? options.childrenAsOutlet;
   const _PageWrapper: any = options.CustomPageWrapper ?? PageWrapper;
   return {
+    ...routeObject,
     path,
     element: _withPageWrapper ? (
       <_PageWrapper path={path} Component={Component} title={title} childrenAsOutlet={_childrenAsOutlet} />
@@ -257,6 +234,11 @@ const transRoute = (
   };
 };
 
+/**
+ * 路由路径排序算法
+ * @param a
+ * @param b
+ */
 const routeSorter = (a: string, b: string) => {
   const aArr = a.split('/');
   const bArr = b.split('/');
@@ -275,7 +257,15 @@ const routeSorter = (a: string, b: string) => {
   return a > b ? 1 : -1;
 };
 
-export const AppRoutes = ({
+/**
+ * useRoutes
+ * @param withPageWrapper
+ * @param CustomPageWrapper
+ * @param childrenAsOutlet
+ * @param debug
+ * @constructor
+ */
+const AppRoutes = ({
   withPageWrapper = true,
   CustomPageWrapper,
   childrenAsOutlet = false,
@@ -285,7 +275,7 @@ export const AppRoutes = ({
   CustomPageWrapper?: CustomPageWrapper;
   childrenAsOutlet?: boolean;
   debug?: boolean;
-}): ReactElement | null => {
+}): React.ReactElement | null => {
   const _routes = useMemo(() => {
     const _routes: Array<RouteObject> = [];
     const { ['/']: _index, ['/*']: _default, ...pages } = _routeMap;
@@ -360,27 +350,12 @@ export const AppRoutes = ({
 };
 
 /**
- * 获取所有的路由绝对路径及相关配置
+ * Router with Routes
+ * @param props
+ * @constructor
  */
-export const getRouteConfig = (): Record<string, RouteOption> =>
-  Object.keys(_routeMap)
-    .sort(routeSorter)
-    .reduce((prev, current) => {
-      prev[current] = _routeMap[current];
-      return prev;
-    }, {} as Record<string, RouteOption>);
-
-interface RenderOptions {
-  type?: 'hash' | 'history';
-  Wrapper?: ReactComponent;
-  withPageWrapper?: boolean;
-  CustomPageWrapper?: CustomPageWrapper;
-  childrenAsOutlet?: boolean;
-  debug?: boolean;
-}
-
-export const AppRouter = (props: RenderOptions) => {
-  const { type, Wrapper = Fragment, ...others } = props;
+const AppRouter = (props: RenderOptions) => {
+  const { type, Wrapper = React.Fragment, ...others } = props;
   const Router = type === 'history' ? BrowserRouter : HashRouter;
   return (
     <Wrapper>
@@ -391,9 +366,72 @@ export const AppRouter = (props: RenderOptions) => {
   );
 };
 
+/**
+ * 获取所有的路由绝对路径及相关配置
+ */
+const getRouteConfig = (): Record<string, RouteOption> =>
+  Object.keys(_routeMap).reduce((prev, current) => {
+    prev[current] = { ..._routeMap[current] };
+    return prev;
+  }, {} as Record<string, RouteOption>);
+
 let _root: Root;
-export const renderApp = (element: HTMLElement, options?: RenderOptions) => {
+/**
+ * ReactDOM.render
+ * @param element
+ * @param options
+ */
+const renderApp = (element: HTMLElement, options?: RenderOptions) => {
   const root = _root ?? createRoot(element);
   !_root && (_root = root);
   root.render(<AppRouter {...options} />);
 };
+
+export {
+  Await,
+  Form,
+  Link,
+  MemoryRouter,
+  NavLink,
+  Navigate,
+  Outlet,
+  ScrollRestoration,
+  // hooks
+  useActionData,
+  useAsyncError,
+  useAsyncValue,
+  useBeforeUnload,
+  useFetcher,
+  useFetchers,
+  useFormAction,
+  useHref,
+  useInRouterContext,
+  useLinkClickHandler,
+  useLoaderData,
+  useLocation,
+  useMatch,
+  useMatches,
+  useNavigate,
+  useNavigation,
+  useNavigationType,
+  useOutlet,
+  useOutletContext,
+  useParams,
+  useResolvedPath,
+  useRevalidator,
+  useRouteError,
+  useRouteLoaderData,
+  useRoutes,
+  useSearchParams,
+  useSubmit,
+  // self
+  $page,
+  AppRouter,
+  AppRoutes,
+  getRouteConfig,
+  page,
+  renderApp,
+  routeSorter,
+  transSearch2Query,
+};
+export type { CustomPageWrapperProps, NavigateFunction, PageWrapperProps };

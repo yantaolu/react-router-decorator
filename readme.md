@@ -77,14 +77,14 @@ Type: `HTMLElement`, the `ReactDOM.render` root element.
 Type: `RenderOptions`
 
 ```ts
-import { ComponentClass, FC } from 'react';
+import { ComponentType } from 'react';
 
 interface Extra {
   withPageWrapper?: boolean;
   childrenAsOutlet?: boolean;
 }
 
-type ReactComponent = (ComponentClass<any, any> | FC<any>) & Extra;
+type ReactComponent = ComponentType<any> & Extra;
 
 interface CustomPageWrapperProps {
   path: string;
@@ -93,7 +93,7 @@ interface CustomPageWrapperProps {
   [p: string]: any;
 }
 
-type CustomPageWrapper = FC<CustomPageWrapperProps> | ComponentClass<CustomPageWrapperProps, any>;
+type CustomPageWrapper = ComponentType<CustomPageWrapperProps>;
 
 interface RenderOptions {
   type?: 'hash' | 'history';
@@ -212,7 +212,7 @@ renderApp(document.getElementById('app'));
 
 ```tsx
 import React from 'react';
-import { Root, createRoot } from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import { AppRouter, AppRoutes, MemoryRouter } from 'react-router-decorator';
 
 // render AppRouter
@@ -236,7 +236,7 @@ type CustomPageWrapperProps = {
   [p: string]: any;
 };
 
-type CustomPageWrapper = FC<CustomPageWrapperProps> | ComponentClass<CustomPageWrapperProps, any>;
+type CustomPageWrapper = React.ComponentType<CustomPageWrapperProps>;
 ```
 
 - `withPageWrapper: false`

@@ -7,7 +7,7 @@ const push = async () => {
   execSync(`git add .`);
   execSync(`git commit -m 'build: 🏹 构建并更新版本至 ${version}'`);
   tag && execSync(`git tag v${version}`);
-  execSync(`git push --follow-tags`);
+  execSync(`git push --tags`);
 };
 
 (async () => {
