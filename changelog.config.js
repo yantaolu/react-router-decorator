@@ -1,7 +1,7 @@
 module.exports = {
   disableEmoji: false,
   format: '{type}{scope}: {emoji}{subject}',
-  list: ['feat', 'fix', 'chore', 'release', 'refactor', 'style', 'perf', 'docs', 'ci', 'test'],
+  list: ['feat', 'fix', 'chore', 'build', 'refactor', 'style', 'perf', 'docs', 'ci', 'test'],
   maxMessageLength: 64,
   minMessageLength: 3,
   questions: [
@@ -48,10 +48,10 @@ module.exports = {
       emoji: '💡',
       value: 'refactor',
     },
-    release: {
-      description: '发布版本',
+    build: {
+      description: '构建并发布版本',
       emoji: '🏹',
-      value: 'release',
+      value: 'build',
     },
     style: {
       description: '标记、空白、格式化、缺少分号... 等代码格式化',
