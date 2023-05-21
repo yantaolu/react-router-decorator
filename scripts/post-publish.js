@@ -6,8 +6,8 @@ const push = async () => {
   const tag = /^[\d.]+$/.test(version);
   execSync(`git add .`);
   execSync(`git commit -m 'build: 🏹 构建并更新版本至 ${version}'`);
-  tag && execSync(`git tag v${version}`);
-  execSync(`git push --tags`);
+  tag && execSync(`git tag -a v${version}`);
+  execSync(`git push --follow-tags`);
 };
 
 (async () => {
