@@ -1,6 +1,7 @@
 const { execSync } = require('child_process');
 const inquirer = require('inquirer');
 const chalk = require('chalk');
+const path = require('path');
 const fs = require('fs');
 const pkg = require('../package.json');
 
@@ -46,7 +47,9 @@ const updateVersion = async () => {
 
   Object.assign(pkg, { version });
 
-  fs.writeFileSync('../package.json', JSON.stringify(pkg, null, 2) + '\n');
+  console.log(chalk.green(version));
+
+  fs.writeFileSync(path.resolve(__dirname, '../package.json'), JSON.stringify(pkg, null, 2) + '\n');
 };
 
 (async () => {
