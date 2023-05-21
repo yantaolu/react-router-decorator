@@ -1,5 +1,5 @@
-<!-- ![npm bundle size](https://img.shields.io/bundlephobia/minzip/react-router-decorator) -->
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/yantaolu/react-router-decorator?display_name=tag) ![npm-donwloads-per-week](https://img.shields.io/npm/dw/react-router-decorator) ![npm-donwloads-per-year](https://img.shields.io/npm/dy/decorator)
+[//]: # (![npm bundle size]&#40;https://img.shields.io/bundlephobia/minzip/react-router-decorator&#41;)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/yantaolu/react-router-decorator?display_name=tag) ![npm-donwloads-per-week](https://img.shields.io/npm/dw/react-router-decorator) ![npm-donwloads-per-year](https://img.shields.io/npm/dy/react-router-decorator)
 
 ---
 
