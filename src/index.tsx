@@ -62,32 +62,33 @@ const _routeMap: Record<string, RouteOption> = {};
 
 /**
  * 地址栏中的 search 转换为 query 对象
- * @param search
+ * @param search {string}
  */
-const transSearch2Query = (search: string): SearchQuery => {
+const transSearch2Query = (search = ''): SearchQuery => {
+  const qs = search?.replace(/^\?+/, '') ?? '';
+
+  if (!qs.length) return {};
+
   return (
-    search
-      ?.replace(/^\?+/, '')
-      .split('&')
-      .reduce((prev: Record<string, number | string | Array<string | number>>, current) => {
-        try {
-          const [key, value] = current.split('=').map(decodeURIComponent);
-          // Automatic parsing number
-          const val = /^[1-9]\d*$/.test(value) && value <= `${Number.MAX_SAFE_INTEGER}` ? Number(value) : value;
-          // Array
-          if (key in prev) {
-            if (!Array.isArray(prev[key])) {
-              prev[key] = [prev[key] as string | number];
-            }
-            (prev[key] as Array<string | number>).push(val);
-          } else {
-            prev[key] = val;
+    qs.split('&').reduce((prev: SearchQuery, current) => {
+      try {
+        const [key, value] = current.split('=').map(decodeURIComponent);
+        // Automatic parsing number
+        const val = /^[1-9]\d*$/.test(value) && value <= `${Number.MAX_SAFE_INTEGER}` ? Number(value) : value;
+        // Array
+        if (key in prev) {
+          if (!Array.isArray(prev[key])) {
+            prev[key] = [prev[key] as string | number];
           }
-        } catch (e) {
-          console.error(e);
+          (prev[key] as Array<string | number>).push(val);
+        } else {
+          prev[key] = val;
         }
-        return prev;
-      }, {}) ?? {}
+      } catch (e) {
+        console.error(e);
+      }
+      return prev;
+    }, {}) ?? {}
   );
 };
 
