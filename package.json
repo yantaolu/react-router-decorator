@@ -12,7 +12,8 @@
     "dev": "tsup --watch",
     "build": "tsup",
     "prepare": "husky install",
-    "prepublish": "npm run build",
+    "prepublish": "node ./scripts/prev-publish.js && npm run build",
+    "postpublish": "node ./scripts/post-publish.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -34,6 +35,7 @@
     "@types/react-dom": "^18.2.4",
     "@typescript-eslint/eslint-plugin": "^5.59.5",
     "@typescript-eslint/parser": "^5.59.5",
+    "chalk": "^4.1.2",
     "commitizen": "^4.3.0",
     "eslint": "^8.40.0",
     "eslint-config-prettier": "^8.0.0",
@@ -62,6 +64,9 @@
   },
   "author": "YantaoLu",
   "license": "ISC",
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,less,sass,scss,css,json,md}": [
       "prettier --write",
