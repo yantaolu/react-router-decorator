@@ -20,8 +20,8 @@ const versions = () => {
 
   return [
     [major, minor, patch].join('.'),
-    [major, Number(minor + 1), 0].join('.'),
-    [Number(major + 1), 0, 0].join('.'),
+    [major, Number(minor) + 1, 0].join('.'),
+    [Number(major) + 1, 0, 0].join('.'),
     [major, minor, [patch, `alpha${alpha + 1}`].join('-')].join('.'),
     [major, minor, [patch, `beta${beta + 1}`].join('-')].join('.'),
   ];
