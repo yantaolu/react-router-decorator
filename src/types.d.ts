@@ -29,38 +29,39 @@ type PageOptions =
 
 type SearchQuery = Record<string, string | number | Array<string | number>>;
 
-interface PageWrapperProps {
+interface WithWrappedProps {
   query: SearchQuery;
   params: Record<string, string>;
   navigate: NavigateFunction;
   children?: React.ReactNode;
 }
 
+interface PageWrapperProps {
+  path: string;
+  Component: ReactComponent;
+  title?: string;
+  context?: string;
+  childrenAsOutlet?: boolean;
+}
+
+type PageWrapper = React.ComponentType<PageWrapperProps>;
+
 interface RenderOptions {
   type?: 'hash' | 'history';
   Wrapper?: ReactComponent;
   withPageWrapper?: boolean;
-  CustomPageWrapper?: CustomPageWrapper;
+  PageWrapper?: PageWrapper;
   childrenAsOutlet?: boolean;
   debug?: boolean;
 }
 
-interface CustomPageWrapperProps {
-  path: string;
-  Component: ReactComponent;
-  title?: string;
-  [p: string]: any;
-}
-
-type CustomPageWrapper = React.ComponentType<CustomPageWrapperProps>;
-
 export type {
-  CustomPageWrapper,
-  CustomPageWrapperProps,
-  PageOptions,
+  PageWrapper,
   PageWrapperProps,
+  PageOptions,
   ReactComponent,
   RenderOptions,
   RouteOption,
   SearchQuery,
+  WithWrappedProps,
 };

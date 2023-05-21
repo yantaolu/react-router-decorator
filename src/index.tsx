@@ -45,14 +45,14 @@ import {
 } from 'react-router-dom';
 
 import type {
-  CustomPageWrapper,
-  CustomPageWrapperProps,
   PageOptions,
+  PageWrapper,
   PageWrapperProps,
   ReactComponent,
   RenderOptions,
   RouteOption,
   SearchQuery,
+  WithWrappedProps,
 } from './types';
 
 /**
@@ -96,14 +96,8 @@ const transSearch2Query = (search: string): SearchQuery => {
  * @param props
  * @constructor
  */
-const PageWrapper = (props: {
-  path: string;
-  Component: ReactComponent;
-  title?: string;
-  context?: string;
-  childrenAsOutlet?: boolean;
-}) => {
-  const { Component, path, title, childrenAsOutlet } = props;
+const PageWrapper = (props: PageWrapperProps) => {
+  const { Component, title, childrenAsOutlet } = props;
   const location = useLocation();
   const params = useParams();
   const navigate = useNavigate();
@@ -123,7 +117,6 @@ const PageWrapper = (props: {
         query,
         params,
         navigate,
-        path,
       }}
     >
       {!!childrenAsOutlet && <Outlet />}
@@ -217,7 +210,7 @@ const $page = (Component: ReactComponent, path: string | '/' | '*', options?: Pa
  */
 const transRoute = (
   config: RouteOption,
-  options: { withPageWrapper: boolean; childrenAsOutlet: boolean; CustomPageWrapper?: CustomPageWrapper },
+  options: { withPageWrapper: boolean; childrenAsOutlet: boolean; CustomPageWrapper?: PageWrapper },
 ): RouteObject => {
   const { path, Component, title, context, ...routeObject } = config;
   const _withPageWrapper = Component.withPageWrapper ?? options.withPageWrapper;
@@ -227,7 +220,13 @@ const transRoute = (
     ...routeObject,
     path,
     element: _withPageWrapper ? (
-      <_PageWrapper path={path} Component={Component} title={title} childrenAsOutlet={_childrenAsOutlet} />
+      <_PageWrapper
+        context={context}
+        path={path}
+        Component={Component}
+        title={title}
+        childrenAsOutlet={_childrenAsOutlet}
+      />
     ) : (
       <Component>{_childrenAsOutlet && <Outlet />}</Component>
     ),
@@ -272,7 +271,7 @@ const AppRoutes = ({
   debug,
 }: {
   withPageWrapper?: boolean;
-  CustomPageWrapper?: CustomPageWrapper;
+  CustomPageWrapper?: PageWrapper;
   childrenAsOutlet?: boolean;
   debug?: boolean;
 }): React.ReactElement | null => {
@@ -434,4 +433,4 @@ export {
   routeSorter,
   transSearch2Query,
 };
-export type { CustomPageWrapperProps, NavigateFunction, PageWrapperProps };
+export type { NavigateFunction, PageWrapperProps, WithWrappedProps };

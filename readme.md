@@ -86,20 +86,21 @@ interface Extra {
 
 type ReactComponent = ComponentType<any> & Extra;
 
-interface CustomPageWrapperProps {
+interface PageWrapperProps {
   path: string;
   Component: ReactComponent;
   title?: string;
-  [p: string]: any;
+  context?: string;
+  childrenAsOutlet?: boolean;
 }
 
-type CustomPageWrapper = ComponentType<CustomPageWrapperProps>;
+type PageWrapper = React.ComponentType<PageWrapperProps>;
 
 interface RenderOptions {
   type?: 'hash' | 'history';
   Wrapper?: ReactComponent;
   withPageWrapper?: boolean;
-  CustomPageWrapper?: CustomPageWrapper;
+  PageWrapper?: PageWrapper;
   childrenAsOutlet?: boolean;
   debug?: boolean;
 }
@@ -126,7 +127,7 @@ type PageOptions = {
 } | string;
 ```
 
-### $page(Component: ReactComponent, path: string | '/' | '*', options?: PageOptions)
+### $page(Component: React.ComponentType<any>, path: string | '/' | '*', options?: PageOptions)
 
 use function to register route.
 
@@ -226,17 +227,18 @@ createRoot(document.getElementById('app')).render(<MemoryRouter>
 
 ### withPageWrapper
 
-- CustomPageWrapper
+- PageWrapper
 
 ```tsx
-type CustomPageWrapperProps = {
+interface PageWrapperProps {
   path: string;
-  Component: ReactComponent;
+  Component: React.ComponentType<any>;
   title?: string;
-  [p: string]: any;
-};
+  context?: string;
+  childrenAsOutlet?: boolean;
+}
 
-type CustomPageWrapper = React.ComponentType<CustomPageWrapperProps>;
+type PageWrapper = React.ComponentType<PageWrapperProps>;
 ```
 
 - `withPageWrapper: false`
@@ -259,6 +261,7 @@ $page(Component, '/test/:id');
 import React from 'react';
   
 const Component = ({ params, query }) => {
+  // 内置 PageWrapper 提供的能力
   const id = params.id;
   return <>{id}</>
 };
