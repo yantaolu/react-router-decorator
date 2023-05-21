@@ -230,7 +230,7 @@ export const $page = (Component: ReactComponent, path: string | '/' | '*', optio
   return page(path, options)(Component);
 };
 
-type CustomPageWrapperProps = {
+export type CustomPageWrapperProps = {
   path: string;
   Component: ReactComponent;
   title?: string;
