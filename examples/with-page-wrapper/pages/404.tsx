@@ -6,7 +6,9 @@ export const _404Page = () => {
   return (
     <>
       <div>当前页面不存在</div>
-      <div onClick={() => navigate('/')}>返回首页</div>
+      <div onClick={() => navigate('/')} style={{ color: 'blue' }}>
+        返回首页
+      </div>
     </>
   );
 };

@@ -5,4 +5,4 @@ import './pages/home';
 import './pages/info';
 import './pages/user';
 
-renderApp(document.getElementById('app') as HTMLElement, { type: 'history', withPageWrapper: true });
+renderApp(document.getElementById('app') as HTMLElement, { type: 'hash', withPageWrapper: true });

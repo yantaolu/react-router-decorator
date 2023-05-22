@@ -99,21 +99,29 @@ const transSearch2Query = (search = ''): SearchQuery => {
  */
 const PageWrapper = (props: PageWrapperProps) => {
   const { Component, title, childrenAsOutlet, context = '', path } = props;
-  const location = useLocation();
+  const { pathname, search } = useLocation();
   const params = useParams();
   const navigate = useNavigate();
-  const query = useMemo(() => transSearch2Query(location.search), [location.search]);
+  const query = useMemo(() => transSearch2Query(search), [search]);
+  const fullPath = resolveAbsolutePath(context, path);
 
   useEffect(() => {
     const originalTitle = document.title;
-    title && (document.title = title);
+
+    if (title) {
+      const regExp = new RegExp(`^${fullPath.replace(/(\/:[^?/]+)/gi, '(\\/[^?/]+)')}$`, 'i');
+      // 路由和当前的路径匹配时
+      regExp.test(pathname.replace(/\/$/, '')) &&
+        (document.title = typeof title === 'function' ? title(params, query) : title);
+    }
+
     return () => {
       document.title = originalTitle;
     };
-  }, [title]);
+  }, [title, pathname, search]);
 
   return (
-    <Component path={resolveAbsolutePath(context, path)} params={params} query={query} navigate={navigate}>
+    <Component path={fullPath} params={params} query={query} navigate={navigate}>
       {!!childrenAsOutlet && <Outlet />}
     </Component>
   );
@@ -138,7 +146,7 @@ const resolveAbsolutePath = (...paths: string[]) =>
 /**
  * 路由路径正则
  */
-const routeRegExp = /^(\/?((:?[\w\d_-]+\??)|(\*)))+$/i;
+const routeRegExp = /^(\/?((:?[\w-]+\??)|(\*)))+$/i;
 
 const legalRouteRules = `/
 test
@@ -300,14 +308,14 @@ const AppRoutes = (props: Omit<RenderOptions, 'type' | 'Wrapper'>): React.ReactE
       .sort(routeSorter)
       .forEach((p) => {
         const option = pages[p];
-        const { path, context, title, Component } = option;
+        const { path, context, ...config } = option;
         // 有上下文则是嵌套路由
         if (context) {
           const parent = getContextRoute(context);
           if (parent && !parent.children) {
-            parent.children = [transRoute({ path: path.substring(1), title, Component }, transOption)];
+            parent.children = [transRoute({ path: path.substring(1), context, ...config }, transOption)];
           } else if (parent?.children) {
-            parent.children.push(transRoute({ path: path.substring(1), title, Component }, transOption));
+            parent.children.push(transRoute({ path: path.substring(1), context, ...config }, transOption));
           } else {
             console.error('未找到匹配的嵌套上下文');
           }

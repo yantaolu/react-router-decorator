@@ -1,10 +1,13 @@
 import React from 'react';
-import { $page } from 'react-router-decorator';
+import { $page, Link } from 'react-router-decorator';
 
 export const About = () => {
   return (
     <h1>
-      About <a href='https://www.npmjs.com/package/react-router-decorator'>react-router-decorator</a>
+      About{' '}
+      <Link target={'_blank'} to={'https://www.npmjs.com/package/react-router-decorator'}>
+        react-router-decorator
+      </Link>
     </h1>
   );
 };

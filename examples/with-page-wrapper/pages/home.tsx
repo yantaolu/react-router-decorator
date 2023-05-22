@@ -1,9 +1,22 @@
 import React from 'react';
-import { page } from 'react-router-decorator';
+import { Link, page } from 'react-router-decorator';
 
-@page('/')
+@page('/', { title: '首页' })
 export class Home extends React.Component<any, any> {
   render() {
-    return <div>Hello World.</div>;
+    return (
+      <div>
+        <h1>Home</h1>
+        <div>
+          <Link to={'/about'}>About</Link>
+        </div>
+        <div>
+          <Link to={`/user`}>User</Link>
+        </div>
+        <div>
+          <Link to={`/user/info/test`}>User Info</Link>
+        </div>
+      </div>
+    );
   }
 }

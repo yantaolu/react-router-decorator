@@ -40,7 +40,7 @@ $ pnpm add react-router-decorator
 }
 ```
 
-### Config `Babel` to support JavaScript/Typescript compiling.
+### Config `Babel`(webpack) to support JavaScript/Typescript compiling.
 
 ```json
 {
@@ -60,6 +60,26 @@ or
     ["@babel/plugin-proposal-decorators", { "version": "2023-01" }]
   ]
 }
+```
+
+### Config `vite.config.ts` to support vite.
+
+```ts
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [
+    react({
+      babel: {
+        parserOpts: {
+          plugins: ['decorators-legacy'],
+        },
+      },
+    }),
+  ],
+});
 ```
 
 ## API
