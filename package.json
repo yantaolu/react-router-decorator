@@ -18,10 +18,16 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "react-router-dom",
+    "react",
+    "router",
+    "route",
+    "decorator",
     "react-router",
-    "decorator-router",
-    "decorator"
+    "react-router-dom",
+    "react-router-dom-decorator",
+    "router-decorator",
+    "react-decorator",
+    "decorator-route"
   ],
   "repository": "https://github.com/yantaolu/react-router-decorator",
   "homepage": "https://github.com/yantaolu/react-router-decorator#readme",
