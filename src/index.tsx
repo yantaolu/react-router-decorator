@@ -45,13 +45,13 @@ import {
 } from 'react-router-dom';
 
 import type {
+  PageComponent,
   PageOptions,
   PageWrapperProps,
   PageWrapperType,
-  ReactComponent,
+  Query,
   RenderOptions,
   RouteOption,
-  SearchQuery,
   WithWrappedProps,
 } from './types';
 
@@ -64,13 +64,13 @@ const _routeMap: Record<string, RouteOption> = {};
  * 地址栏中的 search 转换为 query 对象
  * @param search {string}
  */
-const transSearch2Query = (search = ''): SearchQuery => {
+const transSearch2Query = (search = ''): Query => {
   const qs = search?.replace(/^\?+/, '') ?? '';
 
   if (!qs.length) return {};
 
   return (
-    qs.split('&').reduce((prev: SearchQuery, current) => {
+    qs.split('&').reduce((prev: Record<string, Query[keyof Query]>, current) => {
       try {
         const [key, value] = current.split('=').map(decodeURIComponent);
         // Automatic parsing number
@@ -189,7 +189,7 @@ const page = (path: string | '/' | '*', options?: PageOptions) => {
     throw new Error(`路由路径不合法，支持的路由路径如: ${legalRouteRules.map((p) => `"${p}"`)}`);
   }
 
-  return (Component: ReactComponent): void => {
+  return (Component: PageComponent): void => {
     _routeMap[resolveAbsolutePath(context, path)] = {
       ...others,
       path: absolutePath,
@@ -205,7 +205,7 @@ const page = (path: string | '/' | '*', options?: PageOptions) => {
  * @param path
  * @param options
  */
-const $page = (Component: ReactComponent, path: string | '/' | '*', options?: PageOptions): void => {
+const $page = (Component: PageComponent, path: string | '/' | '*', options?: PageOptions): void => {
   return page(path, options)(Component);
 };
 
@@ -425,8 +425,8 @@ export {
   $page,
   AppRouter,
   AppRoutes,
-  getRouteConfig,
   PageWrapper,
+  getRouteConfig,
   page,
   renderApp,
   routeSorter,

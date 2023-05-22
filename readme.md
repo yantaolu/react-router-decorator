@@ -90,52 +90,50 @@ export default defineConfig({
 import React from 'react';
 import { NavigateFunction, RouteObject } from 'react-router-dom';
 
-/**
- * 组件上可设置属性用于开启或关闭 `withPageWrapper` `childrenAsOutlet` 优先级最高
- */
 interface Extra {
   withPageWrapper?: boolean;
   childrenAsOutlet?: boolean;
 }
 
-type ReactComponent = React.ComponentType<any> & Extra;
-
 type PickRouteObject = Pick<RouteObject, 'loader' | 'action'>;
 
-type SearchQuery = Record<string, string | number | Array<string | number> | undefined>;
+type PageComponent = React.ComponentType<any> & Extra;
+
+type Query = {
+  readonly [key in string]: string | number | Array<string | number> | undefined;
+};
+
+type Params = {
+  readonly [key in string]: string | undefined;
+};
+
+interface PageDefine {
+  title?: string | ((params: Params, query: Query) => string);
+  context?: string;
+  lazy?: boolean;
+}
 
 interface WithWrappedProps {
-  query: SearchQuery;
-  params: Record<string, string>;
+  query: Query;
+  params: Params;
   navigate: NavigateFunction;
   path: string;
   children?: React.ReactNode;
 }
 
-interface PageWrapperProps {
+interface PageWrapperProps extends PageDefine {
   path: string;
-  Component: ReactComponent;
-  title?: string | ((params: Record<string, string | undefined>, query: SearchQuery) => string);
-  context?: string;
+  Component: PageComponent;
   childrenAsOutlet?: boolean;
-  lazy?: boolean;
 }
 
 type PageWrapperType = React.ComponentType<PageWrapperProps>;
 
-type RouteOption = {
-  path: string;
-  Component: ReactComponent;
-  title?: PageWrapperProps['title'];
-  context?: string;
-  lazy?: boolean;
-} & PickRouteObject;
-
-type PageOptions = Omit<RouteOption, 'path' | 'Component'> | string;
+type PageOptions = (PageDefine & PickRouteObject) | string;
 
 interface RenderOptions {
   type?: 'hash' | 'history';
-  Wrapper?: ReactComponent;
+  Wrapper?: React.ComponentType<any>;
   withPageWrapper?: boolean;
   PageWrapper?: PageWrapperType;
   childrenAsOutlet?: boolean;
@@ -169,22 +167,13 @@ Type: `string` , `"/"` or `"*"`
 
 Type: `PageOptions`, if `typeof PageOptions` is `string` it's mean `document title`.
 
-```ts
-type PageOptions = {
-  // document title
-  title?: string;
-  // context of nested routes
-  context?: string;
-} | string;
-```
-
-### $page(Component: React.ComponentType<any>, path: string | '/' | '*', options?: PageOptions)
+### $page(Component: PageComponent, path: string | '/' | '*', options?: PageOptions)
 
 use function to register route.
 
 #### Component
 
-Type: `React.ComponentClass` or `React.FC`
+Type: `PageComponent`
 
 #### path
 
@@ -281,15 +270,11 @@ createRoot(document.getElementById('app')).render(<MemoryRouter>
 - PageWrapper
 
 ```tsx
-interface PageWrapperProps {
-  path: string;
-  Component: React.ComponentType<any>;
-  title?: string;
-  context?: string;
-  childrenAsOutlet?: boolean;
-}
-
-type PageWrapper = React.ComponentType<PageWrapperProps>;
+const CustomPageWrapper: PageWrapperType = (props: PageWrapperProps) => {
+  const { Component, ...others } = props;
+  // do something
+  return <Component/>
+};
 ```
 
 - `withPageWrapper: false`
