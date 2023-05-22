@@ -20,4 +20,5 @@ export default defineConfig({
       'react-router-decorator': path.resolve(__dirname, './src/index.tsx'),
     },
   },
+  base: './',
 });

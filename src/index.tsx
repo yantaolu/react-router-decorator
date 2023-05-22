@@ -46,8 +46,8 @@ import {
 
 import type {
   PageOptions,
-  PageWrapper,
   PageWrapperProps,
+  PageWrapperType,
   ReactComponent,
   RenderOptions,
   RouteOption,
@@ -97,8 +97,8 @@ const transSearch2Query = (search = ''): SearchQuery => {
  * @param props
  * @constructor
  */
-const PageWrapper = (props: PageWrapperProps) => {
-  const { Component, title, childrenAsOutlet, context = '', path } = props;
+const PageWrapper: PageWrapperType = (props: PageWrapperProps) => {
+  const { Component, title, childrenAsOutlet, context = '', path, lazy } = props;
   const { pathname, search } = useLocation();
   const params = useParams();
   const navigate = useNavigate();
@@ -120,10 +120,14 @@ const PageWrapper = (props: PageWrapperProps) => {
     };
   }, [title, pathname, search]);
 
+  const Wrapper = lazy ? React.Suspense : React.Fragment;
+
   return (
-    <Component path={fullPath} params={params} query={query} navigate={navigate}>
-      {!!childrenAsOutlet && <Outlet />}
-    </Component>
+    <Wrapper>
+      <Component path={fullPath} params={params} query={query} navigate={navigate}>
+        {!!childrenAsOutlet && <Outlet />}
+      </Component>
+    </Wrapper>
   );
 };
 
@@ -172,7 +176,7 @@ test
  * @param options 附加参数
  */
 const page = (path: string | '/' | '*', options?: PageOptions) => {
-  const { title, context = '', ...routeObject } = typeof options === 'string' ? { title: options } : options ?? {};
+  const { context = '', ...others } = typeof options === 'string' ? { title: options } : options ?? {};
 
   // 嵌套路由上下文不合法
   if (context.trim() && !context.startsWith('/')) {
@@ -187,11 +191,10 @@ const page = (path: string | '/' | '*', options?: PageOptions) => {
 
   return (Component: ReactComponent): void => {
     _routeMap[resolveAbsolutePath(context, path)] = {
-      ...routeObject,
+      ...others,
       path: absolutePath,
-      Component: Component,
+      Component,
       context,
-      title,
     };
   };
 };
@@ -215,10 +218,13 @@ const transRoute = (
   config: RouteOption,
   options: Pick<RenderOptions, 'PageWrapper' | 'withPageWrapper' | 'childrenAsOutlet'>,
 ): RouteObject => {
-  const { path, Component, title, context, ...routeObject } = config;
+  const { path, Component, title, context, lazy, ...routeObject } = config;
   const _withPageWrapper = Component.withPageWrapper ?? options.withPageWrapper;
   const _childrenAsOutlet = Component.childrenAsOutlet ?? options.childrenAsOutlet;
-  const _PageWrapper: React.ComponentType<any> = options.PageWrapper ?? PageWrapper;
+  const _PageWrapper: PageWrapperType = options.PageWrapper ?? PageWrapper;
+
+  const Wrapper = lazy ? React.Suspense : React.Fragment;
+
   return {
     ...routeObject,
     path,
@@ -229,9 +235,12 @@ const transRoute = (
         Component={Component}
         title={title}
         childrenAsOutlet={_childrenAsOutlet}
+        lazy={lazy}
       />
     ) : (
-      <Component>{_childrenAsOutlet && <Outlet />}</Component>
+      <Wrapper>
+        <Component>{_childrenAsOutlet && <Outlet />}</Component>
+      </Wrapper>
     ),
   };
 };
@@ -423,4 +432,4 @@ export {
   routeSorter,
   transSearch2Query,
 };
-export type { NavigateFunction, PageWrapperProps, WithWrappedProps };
+export type { NavigateFunction, PageWrapperProps, PageWrapperType, WithWrappedProps };

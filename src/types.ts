@@ -13,7 +13,7 @@ type ReactComponent = React.ComponentType<any> & Extra;
 
 type PickRouteObject = Pick<RouteObject, 'loader' | 'action'>;
 
-type SearchQuery = Record<string, string | number | Array<string | number>>;
+type SearchQuery = Record<string, string | number | Array<string | number> | undefined>;
 
 interface WithWrappedProps {
   query: SearchQuery;
@@ -29,37 +29,34 @@ interface PageWrapperProps {
   title?: string | ((params: Record<string, string | undefined>, query: SearchQuery) => string);
   context?: string;
   childrenAsOutlet?: boolean;
+  lazy?: boolean;
 }
 
-type PageWrapper = React.ComponentType<PageWrapperProps>;
+type PageWrapperType = React.ComponentType<PageWrapperProps>;
 
 type RouteOption = {
   path: string;
   Component: ReactComponent;
   title?: PageWrapperProps['title'];
   context?: string;
+  lazy?: boolean;
 } & PickRouteObject;
 
-type PageOptions =
-  | ({
-      title?: PageWrapperProps['title'];
-      context?: string;
-    } & PickRouteObject)
-  | string;
+type PageOptions = Omit<RouteOption, 'path' | 'Component'> | string;
 
 interface RenderOptions {
   type?: 'hash' | 'history';
   Wrapper?: ReactComponent;
   withPageWrapper?: boolean;
-  PageWrapper?: PageWrapper;
+  PageWrapper?: PageWrapperType;
   childrenAsOutlet?: boolean;
   debug?: boolean;
 }
 
 export type {
-  PageWrapper,
-  PageWrapperProps,
   PageOptions,
+  PageWrapperProps,
+  PageWrapperType,
   ReactComponent,
   RenderOptions,
   RouteOption,

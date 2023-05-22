@@ -82,6 +82,65 @@ export default defineConfig({
 });
 ```
 
+## type.d.ts
+
+```ts
+import React from 'react';
+import { NavigateFunction, RouteObject } from 'react-router-dom';
+
+/**
+ * 组件上可设置属性用于开启或关闭 `withPageWrapper` `childrenAsOutlet` 优先级最高
+ */
+interface Extra {
+  withPageWrapper?: boolean;
+  childrenAsOutlet?: boolean;
+}
+
+type ReactComponent = React.ComponentType<any> & Extra;
+
+type PickRouteObject = Pick<RouteObject, 'loader' | 'action'>;
+
+type SearchQuery = Record<string, string | number | Array<string | number> | undefined>;
+
+interface WithWrappedProps {
+  query: SearchQuery;
+  params: Record<string, string>;
+  navigate: NavigateFunction;
+  path: string;
+  children?: React.ReactNode;
+}
+
+interface PageWrapperProps {
+  path: string;
+  Component: ReactComponent;
+  title?: string | ((params: Record<string, string | undefined>, query: SearchQuery) => string);
+  context?: string;
+  childrenAsOutlet?: boolean;
+  lazy?: boolean;
+}
+
+type PageWrapperType = React.ComponentType<PageWrapperProps>;
+
+type RouteOption = {
+  path: string;
+  Component: ReactComponent;
+  title?: PageWrapperProps['title'];
+  context?: string;
+  lazy?: boolean;
+} & PickRouteObject;
+
+type PageOptions = Omit<RouteOption, 'path' | 'Component'> | string;
+
+interface RenderOptions {
+  type?: 'hash' | 'history';
+  Wrapper?: ReactComponent;
+  withPageWrapper?: boolean;
+  PageWrapper?: PageWrapperType;
+  childrenAsOutlet?: boolean;
+  debug?: boolean;
+}
+```
+
 ## API
 
 ### renderApp(element: HTMLElement, options?: RenderOptions)
@@ -95,36 +154,6 @@ Type: `HTMLElement`, the `ReactDOM.render` root element.
 #### options
 
 Type: `RenderOptions`
-
-```ts
-import { ComponentType } from 'react';
-
-interface Extra {
-  withPageWrapper?: boolean;
-  childrenAsOutlet?: boolean;
-}
-
-type ReactComponent = ComponentType<any> & Extra;
-
-interface PageWrapperProps {
-  path: string;
-  Component: ReactComponent;
-  title?: string;
-  context?: string;
-  childrenAsOutlet?: boolean;
-}
-
-type PageWrapper = React.ComponentType<PageWrapperProps>;
-
-interface RenderOptions {
-  type?: 'hash' | 'history';
-  Wrapper?: ReactComponent;
-  withPageWrapper?: boolean;
-  PageWrapper?: PageWrapper;
-  childrenAsOutlet?: boolean;
-  debug?: boolean;
-}
-```
 
 ### page(path: string | '/' | '*', options?: PageOptions)
 
@@ -334,4 +363,17 @@ class PageUserInfo extends React.Component {
     return <div>user info</div>
   }
 }
+```
+
+### [lazy](https://github.com/yantaolu/react-router-decorator/tree/main/examples/lazy)
+
+```tsx
+import { lazy } from 'react';
+import { page, $page, Outlet, NavLink, renderApp } from 'react-router-decorator';
+
+const LazyComponent = lazy(() => import('./pages/lazy'));
+
+$page(LazyComponent, '/lazy', { lazy: true });
+
+renderApp(document.getElementById('app'));
 ```

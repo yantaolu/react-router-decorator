@@ -10,6 +10,7 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "dev:example": "vite",
+    "build:example": "vite build",
     "dev": "tsup --watch",
     "build": "tsup",
     "prepare": "husky install",
