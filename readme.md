@@ -1,5 +1,7 @@
 [//]: # (![npm bundle size]&#40;https://img.shields.io/bundlephobia/minzip/react-router-decorator&#41;)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/yantaolu/react-router-decorator?display_name=tag) ![npm-donwloads-per-week](https://img.shields.io/npm/dw/react-router-decorator) ![npm-donwloads-per-year](https://img.shields.io/npm/dy/react-router-decorator)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/yantaolu/react-router-decorator?display_name=tag) ![npm-donwloads-per-week](https://img.shields.io/npm/dw/react-router-decorator) 
+
+[//]: # (![npm-donwloads-per-year]&#40;https://img.shields.io/npm/dy/react-router-decorator&#41;)
 
 ---
 
@@ -365,11 +367,11 @@ class PageUserInfo extends React.Component {
 }
 ```
 
-### [lazy](https://github.com/yantaolu/react-router-decorator/tree/main/examples/lazy)
+### [lazy](https://github.com/yantaolu/react-router-decorator/tree/main/examples/lazy) (since 0.2.0)
 
 ```tsx
 import { lazy } from 'react';
-import { page, $page, Outlet, NavLink, renderApp } from 'react-router-decorator';
+import { $page, renderApp } from 'react-router-decorator';
 
 const LazyComponent = lazy(() => import('./pages/lazy'));
 
