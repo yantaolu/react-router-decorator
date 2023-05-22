@@ -1,6 +1,7 @@
 # 忽略目录
 dist/
 scripts/
+examples/
 
 # 忽略文件
 package-lock.json
