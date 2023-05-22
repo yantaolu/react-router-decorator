@@ -4,4 +4,4 @@ import './pages/home';
 import './pages/info';
 import './pages/user';
 
-renderApp(document.getElementById('app') as HTMLElement, { type: 'history', withPageWrapper: false });
+renderApp(document.getElementById('app') as HTMLElement, { type: 'hash', withPageWrapper: false });

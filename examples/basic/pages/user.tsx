@@ -6,7 +6,7 @@ export class User extends React.Component {
   render() {
     return (
       <>
-        <div>用户</div>
+        <h1>用户主页</h1>
         {/* 嵌套路由插槽 */}
         <Outlet />
       </>

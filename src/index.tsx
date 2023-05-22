@@ -296,8 +296,6 @@ const AppRoutes = (props: Omit<RenderOptions, 'type' | 'Wrapper'>): React.ReactE
 
     _index && _routes.push(transRoute(_index, transOption));
 
-    debug && console.log('原始路由路径', Object.keys(_routeMap));
-
     Object.keys(pages)
       .sort(routeSorter)
       .forEach((p) => {
@@ -305,7 +303,6 @@ const AppRoutes = (props: Omit<RenderOptions, 'type' | 'Wrapper'>): React.ReactE
         const { path, context, title, Component } = option;
         // 有上下文则是嵌套路由
         if (context) {
-          console.log(context, path);
           const parent = getContextRoute(context);
           if (parent && !parent.children) {
             parent.children = [transRoute({ path: path.substring(1), title, Component }, transOption)];
@@ -322,8 +319,9 @@ const AppRoutes = (props: Omit<RenderOptions, 'type' | 'Wrapper'>): React.ReactE
     _default && _routes.push(transRoute({ ..._default, path: '*' }, transOption));
 
     if (debug) {
-      console.warn('[SpaRouter Debug]: 路由配置如下\n');
-      console.log(_routes);
+      console.warn('[Debug] 路由路径', Object.keys(_routeMap));
+      console.warn('[Debug] 路由配置如下:');
+      console.warn(_routes);
     }
     return _routes;
   }, [Object.keys(_routeMap).join(';')]);

@@ -3,8 +3,12 @@ import { $page, useParams } from 'react-router-decorator';
 
 export const Info = () => {
   const params = useParams();
-  console.log('用户id', params.id);
-  return <div>用户详情</div>;
+  return (
+    <>
+      <h2>用户详情</h2>
+      <h4>用户 {params.id}</h4>
+    </>
+  );
 };
 
 $page(Info, '/info/:id', { title: '用户详情', context: '/user' });
