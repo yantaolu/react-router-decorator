@@ -1,7 +1,9 @@
-[//]: # (![npm bundle size]&#40;https://img.shields.io/bundlephobia/minzip/react-router-decorator&#41;)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/yantaolu/react-router-decorator?display_name=tag) ![npm-donwloads-per-week](https://img.shields.io/npm/dw/react-router-decorator) 
-
-[//]: # (![npm-donwloads-per-year]&#40;https://img.shields.io/npm/dy/react-router-decorator&#41;)
+![npm type definitions](https://img.shields.io/npm/types/react-router-decorator)
+![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/yantaolu/react-router-decorator/react-router-dom)
+![npm](https://img.shields.io/npm/v/react-router-decorator)
+![NPM](https://img.shields.io/npm/l/react-router-decorator)
+![npm](https://img.shields.io/npm/dw/react-router-decorator)
+![GitHub last commit](https://img.shields.io/github/last-commit/yantaolu/react-router-decorator)
 
 ---
 
