@@ -76,10 +76,6 @@
     "prettier-plugin-packagejson": "^2.4.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "stylelint": "^15.6.1",
-    "stylelint-config-rational-order": "^0.1.2",
-    "stylelint-config-standard": "^33.0.0",
-    "stylelint-prettier": "^3.0.0",
     "tsup": "^6.7.0",
     "typescript": "^5.0.4",
     "vite": "^4.3.8"
