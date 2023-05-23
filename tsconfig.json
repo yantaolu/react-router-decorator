@@ -2,11 +2,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "target": "es6",
-    "lib": [
-      "ESNext",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "jsx": "react",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -14,9 +10,7 @@
     "rootDir": "./",
     "moduleResolution": "Node",
     "paths": {
-      "react-router-decorator": [
-        "./src/index.tsx"
-      ]
+      "react-router-decorator": ["./src/index.tsx"]
     },
     "resolveJsonModule": true,
     "allowArbitraryExtensions": true,
@@ -33,16 +27,8 @@
     "noUnusedParameters": true,
     "exactOptionalPropertyTypes": false,
     "noImplicitReturns": true,
-    "skipLibCheck": true
+    "skipLibCheck": false
   },
-  "include": [
-    "src",
-    "examples",
-    "vite.config.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "lib",
-    "examples/vite"
-  ]
+  "include": ["src", "examples", "vite.config.ts"],
+  "exclude": ["node_modules", "lib", "examples/vite", "commitlint.config.js"]
 }

@@ -2,22 +2,6 @@
   "name": "react-router-decorator",
   "version": "0.2.2",
   "description": "基于 react-router-dom 封装的路由工具，提供装饰器/函数模式设置路由，自动排序，支持嵌套路由",
-  "files": [
-    "lib"
-  ],
-  "module": "lib/index.mjs",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "scripts": {
-    "dev:example": "vite",
-    "build:example": "vite build",
-    "dev": "tsup --watch",
-    "build": "tsup",
-    "prepare": "husky install",
-    "prepublish": "node ./scripts/prev-publish.js && npm run build",
-    "postpublish": "node ./scripts/post-publish.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": [
     "react",
     "router",
@@ -30,14 +14,46 @@
     "react-decorator",
     "decorator-route"
   ],
-  "repository": "https://github.com/yantaolu/react-router-decorator",
   "homepage": "https://github.com/yantaolu/react-router-decorator#readme",
+  "repository": "https://github.com/yantaolu/react-router-decorator",
+  "license": "ISC",
+  "author": "YantaoLu",
+  "main": "lib/index.js",
+  "module": "lib/index.mjs",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "build:example": "vite build",
+    "commit": "git-cz",
+    "dev": "tsup --watch",
+    "dev:example": "vite",
+    "prepare": "husky install",
+    "prepublish": "node ./scripts/prev-publish.js && npm run build",
+    "postpublish": "node ./scripts/post-publish.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "lint-staged": {
+    "{src,examples}/**/*.{js,jsx,ts,tsx,less,sass,scss,css,json,md}": [
+      "prettier --write",
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "@commitlint/cz-commitlint"
+    }
+  },
   "dependencies": {
     "react-router-dom": "^6.11.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.6.3",
     "@commitlint/config-conventional": "^17.6.3",
+    "@commitlint/cz-commitlint": "^17.5.0",
     "@swc/core": "^1.3.58",
     "@types/node": "14",
     "@types/react": "^18.2.6",
@@ -52,7 +68,6 @@
     "eslint-plugin-jsx-a11y": "^6.2.1",
     "eslint-plugin-react": "^7.31.8",
     "eslint-plugin-react-hooks": "^4.1.2",
-    "git-cz": "^4.9.0",
     "husky": "^8.0.0",
     "inquirer": "^8.2.5",
     "lint-staged": "^13.2.2",
@@ -73,21 +88,7 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
   },
-  "author": "YantaoLu",
-  "license": "ISC",
   "engines": {
     "node": ">=14.0.0"
-  },
-  "lint-staged": {
-    "{src,examples}/**/*.{js,jsx,ts,tsx,less,sass,scss,css,json,md}": [
-      "prettier --write",
-      "eslint --fix",
-      "git add"
-    ]
-  },
-  "config": {
-    "commitizen": {
-      "path": "git-cz"
-    }
   }
 }
