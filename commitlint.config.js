@@ -1,10 +1,5 @@
 module.exports = {
-  extends: ['@commitlint/config-conventional'],
-  rules: {
-    'type-enum': [
-      2,
-      'always',
-      ['build', 'chore', 'ci', 'docs', 'feat', 'fix', 'perf', 'refactor', 'revert', 'style', 'test'],
-    ],
-  },
+  extends: ['@handy-js/git-cz/lib/config'],
+  types: ['feat', 'fix', 'chore', 'docs', 'test', 'build', 'refactor'],
+  skips: ['scope', 'body', 'footer'],
 };
