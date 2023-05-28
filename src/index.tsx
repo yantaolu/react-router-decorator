@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { Root, createRoot } from 'react-dom/client';
+import ReactDOM from 'react-dom';
 import {
   // components
   Await,
@@ -372,16 +372,13 @@ const getRouteConfig = (): Record<string, RouteOption> =>
     return prev;
   }, {} as Record<string, RouteOption>);
 
-let _root: Root;
 /**
  * ReactDOM.render
  * @param element
  * @param options
  */
 const renderApp = (element: HTMLElement, options?: RenderOptions) => {
-  const root = _root ?? createRoot(element);
-  !_root && (_root = root);
-  root.render(<AppRouter {...options} />);
+  ReactDOM.render(<AppRouter {...options} />, element);
 };
 
 export {
