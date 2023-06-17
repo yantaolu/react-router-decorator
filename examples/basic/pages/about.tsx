@@ -12,4 +12,4 @@ export const About = () => {
   );
 };
 
-$page(About, '/about', { title: '关于' });
+$page(About, '/about', { title: '关于', context: '/' });

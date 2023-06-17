@@ -277,7 +277,7 @@ const AppRoutes = (props: Omit<RenderOptions, 'type' | 'Wrapper'>): React.ReactE
   const { withPageWrapper = true, PageWrapper, childrenAsOutlet = false, debug = false } = props;
   const _routes = useMemo(() => {
     const _routes: Array<RouteObject> = [];
-    const { ['/']: _index, ['/*']: _default, ...pages } = _routeMap;
+    const { ['/']: _index, ...pages } = _routeMap;
 
     const deepContextRoute = (ctx: string, routes: Array<RouteObject>, p?: string): RouteObject | undefined => {
       const len = routes.length;
@@ -332,8 +332,6 @@ const AppRoutes = (props: Omit<RenderOptions, 'type' | 'Wrapper'>): React.ReactE
           _routes.push(transRoute(option, transOption));
         }
       });
-
-    _default && _routes.push(transRoute({ ..._default, path: '*' }, transOption));
 
     if (debug) {
       console.warn('[Debug] 路由路径', Object.keys(_routeMap));

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, page } from 'react-router-decorator';
 
-@page('/', { title: '首页' })
+@page('/home', { title: '首页', context: '/' })
 export class Home extends React.Component<any, any> {
   render() {
     return (
