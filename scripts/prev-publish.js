@@ -34,7 +34,7 @@ const updateVersion = async () => {
   if (status.includes('无文件要提交，干净的工作区') || status.includes('nothing to commit, working tree clean')) {
   } else {
     console.log(chalk.red('请先提交代码，保持工作区干净'));
-    process.exit(1);
+    // process.exit(1);
   }
 
   const { version } = await inquirer.prompt({
