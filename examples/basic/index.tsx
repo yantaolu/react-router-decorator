@@ -1,5 +1,5 @@
 import React from 'react';
-import { $page, Outlet, renderApp, WithWrappedProps } from 'react-router-decorator';
+import { $page, DevRouterHelper, Outlet, WithWrappedProps, renderApp } from 'react-router-decorator';
 import './pages/404';
 import './pages/about';
 import './pages/home';
@@ -9,6 +9,7 @@ import './pages/user';
 const App = (props: WithWrappedProps) => {
   return (
     <>
+      <DevRouterHelper />
       <div>主路由</div>
       <Outlet />
       {props.children}

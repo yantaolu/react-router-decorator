@@ -69,7 +69,7 @@ export const transSearch2Query = (search = ''): Query => {
  * @constructor
  */
 export const DevRouterHelper: React.FC<{ label?: string }> = (props) => {
-  const { label = '快捷路由(仅开发模式显示，鼠标移出消失，鼠标停留上边界会再次显示):' } = props;
+  const { label = '快捷路由 (仅开发模式使用，鼠标移出消失、悬停上边界显示) :' } = props;
   const [visible, setVisible] = React.useState<boolean>(true);
 
   const timeoutRef = React.useRef<any>();
@@ -122,15 +122,17 @@ export const DevRouterHelper: React.FC<{ label?: string }> = (props) => {
       <style></style>
       <div
         style={{
-          padding: '8px 12px',
+          padding: '6px 12px',
           background: '#dfdfdf',
           display: 'flex',
           justifyContent: 'flex-start',
+          flexWrap: 'wrap',
           alignItems: 'center',
           fontSize: 12,
-          lineHeight: '16px',
-          transition: 'opacity 0.3s ease-in-out',
+          lineHeight: '20px',
           opacity: visible ? 1 : 0,
+          transform: visible ? 'translateY(0)' : 'translateY(-100%)',
+          transition: 'all 0.3s ease-in-out',
         }}
       >
         <span style={{ color: 'red', marginRight: 12, userSelect: 'none' }}>{label}</span>
