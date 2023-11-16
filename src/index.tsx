@@ -114,6 +114,7 @@ export const DevRouterHelper: React.FC<{ label?: string }> = (props) => {
         left: 0,
         right: 0,
         minHeight: 20,
+        zIndex: 99999999,
       }}
       onMouseEnter={show}
       onMouseLeave={hide}
@@ -122,7 +123,6 @@ export const DevRouterHelper: React.FC<{ label?: string }> = (props) => {
       <div
         style={{
           padding: '8px 12px',
-          zIndex: 99999999,
           background: '#dfdfdf',
           display: 'flex',
           justifyContent: 'flex-start',
