@@ -88,7 +88,7 @@ export const DevRouterHelper: React.FC<{ label?: string }> = (props) => {
 
   React.useEffect(() => {
     timeoutRef.current && clearTimeout(timeoutRef.current);
-    // timeoutRef.current = setTimeout(hide, 10000);
+    timeoutRef.current = setTimeout(hide, 10000);
     return () => timeoutRef.current && clearTimeout(timeoutRef.current);
   }, []);
 
