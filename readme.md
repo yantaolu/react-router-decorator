@@ -366,3 +366,31 @@ $page(LazyComponent, '/lazy', { lazy: true });
 
 renderApp(document.getElementById('app'));
 ```
+
+## DevRouterHelper (since 1.0.2)
+![img.png](img.png)
+
+```typescript jsx
+import { AppRouter, DevRouterHelper, PageWrapper } from 'react-router-decorator'
+
+const CustomPageWrapper: FC<PageWrapperProps> = (props) => {
+  return (
+    <>
+      {/* 这里可以写页面公共的代码，如导航头部 */}
+      {process.env.NODE_ENV === 'development' && <DevRouterHelper />}
+      <PageWrapper {...props} />
+    </>
+  );
+};
+
+const App = () => {
+  return (
+    <>
+      {/* 这里可以增加app级别的代码，如使用antd ConfigProvider 包裹 */}
+      <AppRouter PageWrapper={CustomPageWrapper} debug={process.env.NODE_ENV === 'development'} />
+    </>
+  );
+};
+```
+
+

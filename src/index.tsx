@@ -1,49 +1,16 @@
-import React, { useEffect, useMemo } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import {
-  // components
-  Await,
   BrowserRouter,
-  Form,
   HashRouter,
   Link,
-  MemoryRouter,
-  NavLink,
-  Navigate,
-  NavigateFunction,
   Outlet,
   RouteObject,
-  ScrollRestoration,
-  // hooks
-  useActionData,
-  useAsyncError,
-  useAsyncValue,
-  useBeforeUnload,
-  useFetcher,
-  useFetchers,
-  useFormAction,
-  useHref,
-  useInRouterContext,
-  useLinkClickHandler,
-  useLoaderData,
   useLocation,
-  useMatch,
-  useMatches,
   useNavigate,
-  useNavigation,
-  useNavigationType,
-  useOutlet,
-  useOutletContext,
   useParams,
-  useResolvedPath,
-  useRevalidator,
-  useRouteError,
-  useRouteLoaderData,
   useRoutes,
-  useSearchParams,
-  useSubmit,
 } from 'react-router-dom';
-
 import type {
   PageComponent,
   PageOptions,
@@ -55,6 +22,9 @@ import type {
   WithWrappedProps,
 } from './types';
 
+export * from 'react-router-dom';
+export type { PageWrapperProps, PageWrapperType, WithWrappedProps };
+
 /**
  * 记录路由
  */
@@ -64,7 +34,7 @@ const _routeMap: Record<string, RouteOption> = {};
  * 地址栏中的 search 转换为 query 对象
  * @param search {string}
  */
-const transSearch2Query = (search = ''): Query => {
+export const transSearch2Query = (search = ''): Query => {
   const qs = search?.replace(/^\?+/, '') ?? '';
 
   if (!qs.length) return {};
@@ -93,19 +63,97 @@ const transSearch2Query = (search = ''): Query => {
 };
 
 /**
+ * 路由辅助工具，可渲染所有路由，方便开发人员切换页面
+ *
+ * @param props
+ * @constructor
+ */
+export const DevRouterHelper: React.FC<{ label?: string }> = (props) => {
+  const { label = '快捷路由(仅开发模式显示，鼠标移出消失，鼠标停留上边界会再次显示):' } = props;
+  const [visible, setVisible] = React.useState<boolean>(true);
+
+  const timeoutRef = React.useRef<any>();
+
+  const show = React.useCallback(() => {
+    timeoutRef.current && clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      setVisible(true);
+    }, 500);
+  }, []);
+
+  const hide = React.useCallback(() => {
+    timeoutRef.current && clearTimeout(timeoutRef.current);
+    setVisible(false);
+  }, []);
+
+  React.useEffect(() => {
+    timeoutRef.current && clearTimeout(timeoutRef.current);
+    // timeoutRef.current = setTimeout(hide, 10000);
+    return () => timeoutRef.current && clearTimeout(timeoutRef.current);
+  }, []);
+
+  const routers = React.useMemo(
+    () =>
+      Object.entries(getRouteConfig()).map(([path, config]) => (
+        <Link
+          key={path}
+          to={path === '/*' ? '__**__' : path}
+          style={{ marginRight: 12, fontSize: 12, color: '#428df5' }}
+        >
+          {typeof config.title === 'function' ? config.title({}, {}) : config.title}
+        </Link>
+      )),
+    [],
+  );
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        minHeight: 20,
+      }}
+      onMouseEnter={show}
+      onMouseLeave={hide}
+    >
+      <style></style>
+      <div
+        style={{
+          padding: '8px 12px',
+          zIndex: 99999999,
+          background: '#dfdfdf',
+          display: 'flex',
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          fontSize: 12,
+          lineHeight: '16px',
+          transition: 'opacity 0.3s ease-in-out',
+          opacity: visible ? 1 : 0,
+        }}
+      >
+        <span style={{ color: 'red', marginRight: 12, userSelect: 'none' }}>{label}</span>
+        {routers}
+      </div>
+    </div>
+  );
+};
+
+/**
  * 默认页面 Wrapper 附加自动解析 params、query 追加 navigate
  * @param props
  * @constructor
  */
-const PageWrapper: PageWrapperType = (props: PageWrapperProps) => {
+export const PageWrapper: PageWrapperType = (props: PageWrapperProps) => {
   const { Component, title, childrenAsOutlet, context = '', path, lazy } = props;
   const { pathname, search } = useLocation();
   const params = useParams();
   const navigate = useNavigate();
-  const query = useMemo(() => transSearch2Query(search), [search]);
+  const query = React.useMemo(() => transSearch2Query(search), [search]);
   const fullPath = resolveAbsolutePath(context, path);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const originalTitle = document.title;
 
     if (title) {
@@ -175,7 +223,7 @@ test
  * @param path 路由路径
  * @param options 附加参数
  */
-const page = (path: string | '/' | '*', options?: PageOptions) => {
+export const page = (path: string | '/' | '*', options?: PageOptions) => {
   const { context = '', ...others } = typeof options === 'string' ? { title: options } : options ?? {};
 
   // 嵌套路由上下文不合法
@@ -205,7 +253,7 @@ const page = (path: string | '/' | '*', options?: PageOptions) => {
  * @param path
  * @param options
  */
-const $page = (Component: PageComponent, path: string | '/' | '*', options?: PageOptions): void => {
+export const $page = (Component: PageComponent, path: string | '/' | '*', options?: PageOptions): void => {
   return page(path, options)(Component);
 };
 
@@ -250,7 +298,7 @@ const transRoute = (
  * @param a
  * @param b
  */
-const routeSorter = (a: string, b: string) => {
+export const routeSorter = (a: string, b: string) => {
   const aArr = a.split('/');
   const bArr = b.split('/');
   const len = Math.max(aArr.length, bArr.length);
@@ -273,9 +321,9 @@ const routeSorter = (a: string, b: string) => {
  * @param props
  * @constructor
  */
-const AppRoutes = (props: Omit<RenderOptions, 'type' | 'Wrapper'>): React.ReactElement | null => {
+export const AppRoutes = (props: Omit<RenderOptions, 'type' | 'Wrapper'>): React.ReactElement | null => {
   const { withPageWrapper = true, PageWrapper, childrenAsOutlet = false, debug = false } = props;
-  const _routes = useMemo(() => {
+  const _routes = React.useMemo(() => {
     const _routes: Array<RouteObject> = [];
     const { ['/']: _index, ...pages } = _routeMap;
 
@@ -349,7 +397,7 @@ const AppRoutes = (props: Omit<RenderOptions, 'type' | 'Wrapper'>): React.ReactE
  * @param props
  * @constructor
  */
-const AppRouter = (props: RenderOptions) => {
+export const AppRouter = (props: RenderOptions) => {
   const { type, Wrapper = React.Fragment, ...others } = props;
   const Router = type === 'history' ? BrowserRouter : HashRouter;
   return (
@@ -364,7 +412,7 @@ const AppRouter = (props: RenderOptions) => {
 /**
  * 获取所有的路由绝对路径及相关配置
  */
-const getRouteConfig = (): Record<string, RouteOption> =>
+export const getRouteConfig = (): Record<string, RouteOption> =>
   Object.keys(_routeMap).reduce((prev, current) => {
     prev[current] = { ..._routeMap[current] };
     return prev;
@@ -375,56 +423,6 @@ const getRouteConfig = (): Record<string, RouteOption> =>
  * @param element
  * @param options
  */
-const renderApp = (element: HTMLElement, options?: RenderOptions) => {
+export const renderApp = (element: HTMLElement, options?: RenderOptions) => {
   ReactDOM.render(<AppRouter {...options} />, element);
 };
-
-export {
-  Await,
-  Form,
-  Link,
-  MemoryRouter,
-  NavLink,
-  Navigate,
-  Outlet,
-  ScrollRestoration,
-  // hooks
-  useActionData,
-  useAsyncError,
-  useAsyncValue,
-  useBeforeUnload,
-  useFetcher,
-  useFetchers,
-  useFormAction,
-  useHref,
-  useInRouterContext,
-  useLinkClickHandler,
-  useLoaderData,
-  useLocation,
-  useMatch,
-  useMatches,
-  useNavigate,
-  useNavigation,
-  useNavigationType,
-  useOutlet,
-  useOutletContext,
-  useParams,
-  useResolvedPath,
-  useRevalidator,
-  useRouteError,
-  useRouteLoaderData,
-  useRoutes,
-  useSearchParams,
-  useSubmit,
-  // self
-  $page,
-  AppRouter,
-  AppRoutes,
-  PageWrapper,
-  getRouteConfig,
-  page,
-  renderApp,
-  routeSorter,
-  transSearch2Query,
-};
-export type { NavigateFunction, PageWrapperProps, PageWrapperType, WithWrappedProps };
