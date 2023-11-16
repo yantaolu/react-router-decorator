@@ -66,10 +66,32 @@ export type RouteOption = Omit<PageWrapperProps, 'childrenAsOutlet'> & PickRoute
 export type PageOptions = (PageDefine & PickRouteObject) | string;
 
 export interface RenderOptions {
+  /**
+   * 路由类型
+   */
   type?: 'hash' | 'history';
+  /**
+   * App Wrapper
+   */
   Wrapper?: React.ComponentType<any>;
+  /**
+   * 使用默认 Page Wrapper
+   */
   withPageWrapper?: boolean;
+  /**
+   * 自定义 Page Wrapper
+   */
   PageWrapper?: PageWrapperType;
+  /**
+   * 使用 children 代替 Outlet
+   */
   childrenAsOutlet?: boolean;
+  /**
+   * 开启调试模式，控制台输出路由信息
+   */
   debug?: boolean;
+  /**
+   * 开启路由辅助工具
+   */
+  helper?: boolean;
 }

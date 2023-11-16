@@ -400,11 +400,12 @@ export const AppRoutes = (props: Omit<RenderOptions, 'type' | 'Wrapper'>): React
  * @constructor
  */
 export const AppRouter = (props: RenderOptions) => {
-  const { type, Wrapper = React.Fragment, ...others } = props;
+  const { type, Wrapper = React.Fragment, helper, ...others } = props;
   const Router = type === 'history' ? BrowserRouter : HashRouter;
   return (
     <Wrapper>
       <Router>
+        {(helper ?? props.debug) && <DevRouterHelper />}
         <AppRoutes {...others} />
       </Router>
     </Wrapper>
