@@ -6,7 +6,7 @@ export const About = () => {
     <h1>
       About{' '}
       <Link target={'_blank'} to={'https://www.npmjs.com/package/react-router-decorator'}>
-        react-router-decorator
+        react-router-decorator 22
       </Link>
     </h1>
   );

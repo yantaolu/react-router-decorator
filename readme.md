@@ -49,7 +49,7 @@ $ pnpm add react-router-decorator
 ```json
 {
   "plugins": [
-    ["@babel/plugin-proposal-decorators", { "version": "2023-01" }],
+    ["@babel/plugin-proposal-decorators", { "version": "2023-05" }],
     "@babel/plugin-proposal-class-properties"
   ]
 }
@@ -60,9 +60,7 @@ or
 ```json
 {
   "presets": ["@babel/preset-env"],
-  "plugins": [
-    ["@babel/plugin-proposal-decorators", { "version": "2023-01" }]
-  ]
+  "plugins": [["@babel/plugin-proposal-decorators", { "version": "2023-05" }]]
 }
 ```
 
@@ -92,30 +90,51 @@ export default defineConfig({
 import React from 'react';
 import { NavigateFunction, RouteObject } from 'react-router-dom';
 
-interface Extra {
+/**
+ * 组件上可设置属性用于开启或关闭 `withPageWrapper` `childrenAsOutlet` 优先级最高
+ */
+export interface Extra {
   withPageWrapper?: boolean;
   childrenAsOutlet?: boolean;
 }
 
-type PickRouteObject = Pick<RouteObject, 'loader' | 'action'>;
+/**
+ * 支持的其他的 RouteObject
+ */
+export type PickRouteObject = Omit<RouteObject, 'Component' | 'path' | 'children'>;
 
-type PageComponent = React.ComponentType<any> & Extra;
+/**
+ * 页面级组件
+ */
+export type PageComponent = React.ComponentType<any> & Extra;
 
-type Query = {
-  readonly [key in string]: string | number | Array<string | number> | undefined;
+/**
+ * 解析 url search 参数
+ */
+export type Query = {
+  readonly [key: string]: undefined | string | string[] | Query | Query[];
 };
 
-type Params = {
-  readonly [key in string]: string | undefined;
+/**
+ * 路由参数
+ */
+export type Params = {
+  readonly [key: string]: string | undefined;
 };
 
-interface PageDefine {
+/**
+ * 注册页面路由时额外的参数
+ */
+export interface PageDefine {
   title?: string | ((params: Params, query: Query) => string);
   context?: string;
   lazy?: boolean;
 }
 
-interface WithWrappedProps {
+/**
+ * 被默认 PageWrapper 包裹的页面自动解析的参数
+ */
+export interface WithWrappedProps {
   query: Query;
   params: Params;
   navigate: NavigateFunction;
@@ -123,23 +142,47 @@ interface WithWrappedProps {
   children?: React.ReactNode;
 }
 
-interface PageWrapperProps extends PageDefine {
+export interface PageWrapperProps extends PageDefine {
   path: string;
   Component: PageComponent;
   childrenAsOutlet?: boolean;
 }
 
-type PageWrapperType = React.ComponentType<PageWrapperProps>;
+export type PageWrapperType = React.ComponentType<PageWrapperProps>;
 
-type PageOptions = (PageDefine & PickRouteObject) | string;
+export type RouteOption = Omit<PageWrapperProps, 'childrenAsOutlet'> & PickRouteObject;
 
-interface RenderOptions {
+export type PageOptions = (PageDefine & PickRouteObject) | string;
+
+export interface RenderOptions {
+  /**
+   * 路由类型
+   */
   type?: 'hash' | 'history';
+  /**
+   * App Wrapper
+   */
   Wrapper?: React.ComponentType<any>;
+  /**
+   * 使用默认 Page Wrapper
+   */
   withPageWrapper?: boolean;
+  /**
+   * 自定义 Page Wrapper
+   */
   PageWrapper?: PageWrapperType;
+  /**
+   * 使用 children 代替 Outlet
+   */
   childrenAsOutlet?: boolean;
+  /**
+   * 开启调试模式，控制台输出路由信息
+   */
   debug?: boolean;
+  /**
+   * 开启路由辅助工具
+   */
+  helper?: boolean;
 }
 ```
 
@@ -157,7 +200,9 @@ Type: `HTMLElement`, the `ReactDOM.render` root element.
 
 Type: `RenderOptions`
 
-### page(path: string | '/' | '*', options?: PageOptions)
+---
+
+### page(path: string | '/' | '\*', options?: PageOptions)
 
 use class decorator to register route.
 
@@ -169,7 +214,9 @@ Type: `string` , `"/"` or `"*"`
 
 Type: `PageOptions`, if `typeof PageOptions` is `string` it's mean `document title`.
 
-### $page(Component: PageComponent, path: string | '/' | '*', options?: PageOptions)
+---
+
+### $page(Component: PageComponent, path: string | '/' | '\*', options?: PageOptions)
 
 use function to register route.
 
@@ -183,7 +230,9 @@ Type: `string` , `"/"` or `"*"`
 
 #### options
 
-Type: `PageOptions`, if `typeof PageOptions` is `string` it's mean `document title`.
+## Type: `PageOptions`, if `typeof PageOptions` is `string` it's mean `document title`.
+
+---
 
 ## Usage
 
@@ -211,7 +260,7 @@ class PageUser extends React.Component {
     </>
   }
 }
-// 嵌套路由指定 context 
+// 嵌套路由指定 context
 @page('/:id', { title: '用户详情', context: '/user' })
 class PageUserInfo extends React.Component {
   render () {
@@ -251,6 +300,8 @@ $page(FuncComponent, '/fun2');
 renderApp(document.getElementById('app'));
 ```
 
+---
+
 ### Custom render
 
 ```tsx
@@ -259,13 +310,17 @@ import { createRoot } from 'react-dom/client';
 import { AppRouter, AppRoutes, MemoryRouter } from 'react-router-decorator';
 
 // render AppRouter
-createRoot(document.getElementById('app')).render(<AppRouter type={'hash'}/>);
+createRoot(document.getElementById('app')).render(<AppRouter type={'hash'} />);
 
 // render AppRoutes
-createRoot(document.getElementById('app')).render(<MemoryRouter>
-  <AppRoutes/>
-</MemoryRouter>);
+createRoot(document.getElementById('app')).render(
+  <MemoryRouter>
+    <AppRoutes />
+  </MemoryRouter>,
+);
 ```
+
+---
 
 ### withPageWrapper
 
@@ -275,7 +330,7 @@ createRoot(document.getElementById('app')).render(<MemoryRouter>
 const CustomPageWrapper: PageWrapperType = (props: PageWrapperProps) => {
   const { Component, ...others } = props;
   // do something
-  return <Component/>
+  return <Component />;
 };
 ```
 
@@ -283,13 +338,13 @@ const CustomPageWrapper: PageWrapperType = (props: PageWrapperProps) => {
 
 ```tsx
 import React from 'react';
-  
+
 const Component = () => {
   const params = useParams();
   const id = params.id;
-  return <>{id}</>
+  return <>{id}</>;
 };
-  
+
 $page(Component, '/test/:id');
 ```
 
@@ -297,16 +352,17 @@ $page(Component, '/test/:id');
 
 ```tsx
 import React from 'react';
-  
+
 const Component = ({ params, query }) => {
   // 内置 PageWrapper 提供的能力
   const id = params.id;
-  return <>{id}</>
+  return <>{id}</>;
 };
-  
+
 $page(Component, '/test/:id');
 ```
 
+---
 
 ### childrenAsOutlet (`{ children } instead of <Outlet/>`)
 
@@ -315,19 +371,21 @@ $page(Component, '/test/:id');
 ```tsx
 @page('/user', { title: '用户页面' })
 class PageUser extends React.Component {
-  render () {
-    return <>
-      <div>User</div>
-      <Outlet/>
-    </>
+  render() {
+    return (
+      <>
+        <div>User</div>
+        <Outlet />
+      </>
+    );
   }
 }
 
-// 嵌套路由指定 context 
+// 嵌套路由指定 context
 @page('/:id', { title: '用户详情', context: '/user' })
 class PageUserInfo extends React.Component {
-  render () {
-    return <div>user info</div>
+  render() {
+    return <div>user info</div>;
   }
 }
 ```
@@ -337,22 +395,26 @@ class PageUserInfo extends React.Component {
 ```tsx
 @page('/user', { title: '用户页面' })
 class PageUser extends React.Component {
-  render () {
-    return <>
-      <div>User</div>
-      {this.props.children}
-    </>
+  render() {
+    return (
+      <>
+        <div>User</div>
+        {this.props.children}
+      </>
+    );
   }
 }
 
-// 嵌套路由指定 context 
+// 嵌套路由指定 context
 @page('/:id', { title: '用户详情', context: '/user' })
 class PageUserInfo extends React.Component {
-  render () {
-    return <div>user info</div>
+  render() {
+    return <div>user info</div>;
   }
 }
 ```
+
+---
 
 ### [lazy](https://github.com/yantaolu/react-router-decorator/tree/main/examples/lazy) (since 0.2.0)
 
@@ -367,11 +429,14 @@ $page(LazyComponent, '/lazy', { lazy: true });
 renderApp(document.getElementById('app'));
 ```
 
+---
+
 ## DevRouterHelper (since 1.0.2)
+
 ![img.png](img.png)
 
 ```typescript jsx
-import { AppRouter, DevRouterHelper, PageWrapper } from 'react-router-decorator'
+import { AppRouter, DevRouterHelper, PageWrapper } from 'react-router-decorator';
 
 const CustomPageWrapper: FC<PageWrapperProps> = (props) => {
   return (
@@ -393,4 +458,27 @@ const App = () => {
 };
 ```
 
+---
 
+## DataRouter (since 1.0.7)
+
+Support the Data APIs.
+
+```typescript jsx
+import { DataRouter, useNavigation, $page } from 'react-router-decorator';
+
+const Home = () => {
+  const navigation = useNavigation();
+};
+
+$page(Home, '/');
+
+const App = () => {
+  return (
+    <>
+      {/* 这里可以增加app级别的代码，如使用antd ConfigProvider 包裹 */}
+      <DataRouter debug={process.env.NODE_ENV === 'development'} helper />
+    </>
+  );
+};
+```

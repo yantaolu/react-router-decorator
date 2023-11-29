@@ -12,7 +12,7 @@ export interface Extra {
 /**
  * 支持的其他的 RouteObject
  */
-export type PickRouteObject = Pick<RouteObject, 'loader' | 'action'>;
+export type PickRouteObject = Omit<RouteObject, 'Component' | 'path' | 'children'>;
 
 /**
  * 页面级组件
@@ -23,14 +23,14 @@ export type PageComponent = React.ComponentType<any> & Extra;
  * 解析 url search 参数
  */
 export type Query = {
-  readonly [key in string]: string | number | Array<string | number> | undefined;
+  readonly [key: string]: undefined | string | string[] | Query | Query[];
 };
 
 /**
  * 路由参数
  */
 export type Params = {
-  readonly [key in string]: string | undefined;
+  readonly [key: string]: string | undefined;
 };
 
 /**

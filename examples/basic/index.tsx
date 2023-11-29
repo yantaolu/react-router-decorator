@@ -16,6 +16,6 @@ const App = (props: WithWrappedProps) => {
   );
 };
 
-$page(App, '/');
+$page(App, '/', '首页');
 
-renderApp(document.getElementById('app') as HTMLElement, { type: 'hash', withPageWrapper: false, debug: true });
+renderApp(document.getElementById('app') as HTMLElement, { type: 'hash', withPageWrapper: true, debug: true });
