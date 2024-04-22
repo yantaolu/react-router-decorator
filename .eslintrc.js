@@ -18,12 +18,5 @@ module.exports = {
     '@typescript-eslint/ban-ts-comment': 1,
     '@typescript-eslint/no-empty-function': 1,
   },
-  globals: {
-    // axios
-    axios: true,
-    // lodash
-    _: true,
-    // jquery
-    $: true,
-  },
+  globals: {},
 };
