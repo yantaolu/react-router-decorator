@@ -1,6 +1,6 @@
 import { IParseOptions, parse } from 'qs';
-import React from 'react';
-import ReactDOM from 'react-dom';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import {
   BrowserRouter,
   HashRouter,
@@ -25,7 +25,7 @@ import type {
   RenderOptions,
   RouteOption,
   WithWrappedProps,
-} from './types';
+} from './type';
 
 export * from 'react-router-dom';
 export type { PageWrapperProps, PageWrapperType, WithWrappedProps };

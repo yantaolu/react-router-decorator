@@ -10,7 +10,7 @@
     "rootDir": "./",
     "moduleResolution": "Node",
     "paths": {
-      "react-router-decorator": ["./src/index.tsx"]
+      "react-router-decorator": ["./es/index"]
     },
     "resolveJsonModule": true,
     "allowArbitraryExtensions": true,

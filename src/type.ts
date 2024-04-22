@@ -40,6 +40,7 @@ export interface PageDefine {
   title?: string | ((params: Params, query: Query) => string);
   context?: string;
   lazy?: boolean;
+  mpa?: string;
 }
 
 /**
