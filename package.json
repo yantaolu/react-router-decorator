@@ -1,6 +1,6 @@
 {
   "name": "react-router-decorator",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "基于 react-router-dom 封装的路由工具，提供装饰器/函数模式设置路由，自动排序，支持嵌套路由",
   "keywords": [
     "react",
@@ -32,7 +32,7 @@
     "dev": "pnpm clean && tsc -p ./tsconfig.es.json --watch",
     "dev:example": "vite",
     "prepare": "husky install",
-    "prepublish": "node ./scripts/prev-publish.js && npm run build",
+    "prepublishOnly": "node ./scripts/prev-publish.js && npm run build",
     "postpublish": "node ./scripts/post-publish.js",
     "clean": "rimraf es lib",
     "test": "echo \"Error: no test specified\" && exit 1"
