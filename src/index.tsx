@@ -35,6 +35,45 @@ export type { PageWrapperProps, PageWrapperType, WithWrappedProps };
  */
 const RoutesRecord: Record<string, RouteOption> = {};
 
+class RouteWatcher {
+  private subscribers: (() => void)[];
+
+  private timeout: any;
+
+  constructor() {
+    this.subscribers = [];
+  }
+
+  /**
+   * 发布路由变化
+   */
+  publish = () => {
+    this.timeout && clearTimeout(this.timeout);
+    this.timeout = setTimeout(() => {
+      this.subscribers.forEach((fn) => {
+        fn();
+      });
+    }, 10);
+  };
+  /**
+   * 订阅路由变化
+   * @param fn
+   */
+  subscribe = (fn: () => void) => {
+    this.subscribers.push(fn);
+  };
+}
+
+const watcher = new RouteWatcher();
+
+const useWatcher = () => {
+  const [count, setCount] = React.useState(Object.keys(RoutesRecord).length);
+  React.useMemo(() => {
+    watcher.subscribe(() => setCount((c) => c + 1));
+  }, []);
+  return count;
+};
+
 /**
  * 将地址栏 search 转换为 query 对象
  */
@@ -87,7 +126,7 @@ export const DevRouterHelper: React.FC<{ label?: string }> = (props) => {
     timeoutRef.current && clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(hide, 10000);
     return () => timeoutRef.current && clearTimeout(timeoutRef.current);
-  }, []);
+  }, [useWatcher()]);
 
   const routers = React.useMemo(
     () =>
@@ -203,32 +242,6 @@ test
   .map((str) => str.trim());
 
 // legalRouteRules.map((str) => console[routeRegExp.test(str) ? 'log' : 'error'](str));
-
-class RouteWatcher {
-  private subscribers: (() => void)[];
-
-  constructor() {
-    this.subscribers = [];
-  }
-
-  /**
-   * 发布路由变化
-   */
-  publish = () => {
-    this.subscribers.forEach((fn) => {
-      fn();
-    });
-  };
-  /**
-   * 订阅路由变化
-   * @param fn
-   */
-  subscribe = (fn: () => void) => {
-    this.subscribers.push(fn);
-  };
-}
-
-const watcher = new RouteWatcher();
 
 /**
  * 类装饰器，用于注册类组件路由
@@ -423,11 +436,7 @@ export const getRoutes = (
  * By use useRoutes([...])
  */
 export const AppRoutes = (props: Omit<RenderOptions, 'type' | 'Wrapper'>): React.ReactElement | null => {
-  const [count, setCount] = React.useState(Object.keys(RoutesRecord).length);
-  React.useMemo(() => {
-    watcher.subscribe(() => setCount((c) => c + 1));
-  }, []);
-  return useRoutes(React.useMemo(() => getRoutes(props), [count]));
+  return useRoutes(React.useMemo(() => getRoutes(props), [useWatcher()]));
 };
 
 /**
